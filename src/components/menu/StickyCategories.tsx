@@ -28,10 +28,10 @@ export function StickyCategories({ categories, activeId, onSelect }: StickyCateg
 
   return (
     <div className="sticky top-[60px] z-40 bg-brand-white/95 dark:bg-brand-black/95 backdrop-blur-sm border-b border-brand-gray-100 dark:border-brand-gray-800">
-      <div className="max-w-lg mx-auto">
+      <div className="max-w-lg md:max-w-2xl lg:max-w-5xl mx-auto">
         <div
           ref={scrollRef}
-          className="flex gap-1 px-4 py-2.5 overflow-x-auto hide-scrollbar"
+          className="flex gap-1 px-4 py-2.5 overflow-x-auto hide-scrollbar justify-start md:justify-center"
           dir="rtl"
         >
           {categories.map((cat) => {

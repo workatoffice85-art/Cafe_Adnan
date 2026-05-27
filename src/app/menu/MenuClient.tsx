@@ -88,7 +88,7 @@ export default function MenuClient({ initialCategories, initialItems }: MenuClie
         onSelect={handleCategorySelect}
       />
 
-      <main className="max-w-lg mx-auto px-5 pb-12">
+      <main className="max-w-lg md:max-w-2xl lg:max-w-5xl mx-auto px-5 pb-12">
         {/* Search */}
         <div className="py-4">
           <SearchBar value={search} onChange={setSearch} />

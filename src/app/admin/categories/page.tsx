@@ -82,61 +82,131 @@ export default function CategoriesPage() {
 
       {/* Categories List */}
       {categories.length > 0 ? (
-        <div className="space-y-2">
-          {categories.map((cat) => (
-            <div
-              key={cat.id}
-              className="bg-brand-white dark:bg-brand-gray-900 rounded-2xl p-4 border border-brand-gray-100 dark:border-brand-gray-800 flex items-center justify-between"
-            >
-              <div className="min-w-0 flex-1">
-                <div className="flex items-center gap-2">
-                  <span className="text-xs text-brand-beige font-semibold bg-brand-beige/10 px-2 py-0.5 rounded-full">
-                    #{cat.sort_order}
-                  </span>
-                </div>
-                <h3 className="text-base font-semibold text-brand-black dark:text-brand-white mt-1">
-                  {cat.name_ar}
-                </h3>
-                <p className="text-sm text-brand-gray-400">{cat.name_en}</p>
-              </div>
-
-              <div className="flex items-center gap-1 mr-2">
-                <button
-                  onClick={() => { setEditingCategory(cat); setShowForm(true); }}
-                  className="p-2.5 rounded-xl hover:bg-brand-gray-100 dark:hover:bg-brand-gray-800 transition-colors"
-                  aria-label={`Edit ${cat.name_en}`}
-                >
-                  <Pencil size={16} className="text-brand-gray-500" />
-                </button>
-
-                {deleteConfirm === cat.id ? (
-                  <div className="flex items-center gap-1">
-                    <button
-                      onClick={() => handleDelete(cat.id)}
-                      className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-red-500 text-white hover:bg-red-600 transition-colors"
-                    >
-                      حذف
-                    </button>
-                    <button
-                      onClick={() => setDeleteConfirm(null)}
-                      className="px-3 py-1.5 rounded-lg text-xs font-medium text-brand-gray-500 hover:bg-brand-gray-100 dark:hover:bg-brand-gray-800 transition-colors"
-                    >
-                      إلغاء
-                    </button>
+        <>
+          {/* Card View (Mobile only) */}
+          <div className="space-y-2 md:hidden">
+            {categories.map((cat) => (
+              <div
+                key={cat.id}
+                className="bg-brand-white dark:bg-brand-gray-900 rounded-2xl p-4 border border-brand-gray-100 dark:border-brand-gray-800 flex items-center justify-between"
+              >
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs text-brand-beige font-semibold bg-brand-beige/10 px-2 py-0.5 rounded-full">
+                      #{cat.sort_order}
+                    </span>
                   </div>
-                ) : (
+                  <h3 className="text-base font-semibold text-brand-black dark:text-brand-white mt-1">
+                    {cat.name_ar}
+                  </h3>
+                  <p className="text-sm text-brand-gray-400">{cat.name_en}</p>
+                </div>
+
+                <div className="flex items-center gap-1 mr-2">
                   <button
-                    onClick={() => setDeleteConfirm(cat.id)}
-                    className="p-2.5 rounded-xl hover:bg-red-50 dark:hover:bg-red-900/10 transition-colors"
-                    aria-label={`Delete ${cat.name_en}`}
+                    onClick={() => { setEditingCategory(cat); setShowForm(true); }}
+                    className="p-2.5 rounded-xl hover:bg-brand-gray-100 dark:hover:bg-brand-gray-800 transition-colors"
+                    aria-label={`Edit ${cat.name_en}`}
                   >
-                    <Trash2 size={16} className="text-red-400" />
+                    <Pencil size={16} className="text-brand-gray-500" />
                   </button>
-                )}
+
+                  {deleteConfirm === cat.id ? (
+                    <div className="flex items-center gap-1">
+                      <button
+                        onClick={() => handleDelete(cat.id)}
+                        className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-red-500 text-white hover:bg-red-600 transition-colors"
+                      >
+                        حذف
+                      </button>
+                      <button
+                        onClick={() => setDeleteConfirm(null)}
+                        className="px-3 py-1.5 rounded-lg text-xs font-medium text-brand-gray-500 hover:bg-brand-gray-100 dark:hover:bg-brand-gray-800 transition-colors"
+                      >
+                        إلغاء
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() => setDeleteConfirm(cat.id)}
+                      className="p-2.5 rounded-xl hover:bg-red-50 dark:hover:bg-red-900/10 transition-colors"
+                      aria-label={`Delete ${cat.name_en}`}
+                    >
+                      <Trash2 size={16} className="text-red-400" />
+                    </button>
+                  )}
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+
+          {/* Table View (Desktop & Tablet) */}
+          <div className="hidden md:block overflow-hidden bg-brand-white dark:bg-brand-gray-900 rounded-2xl border border-brand-gray-100 dark:border-brand-gray-800">
+            <table className="w-full border-collapse text-right">
+              <thead>
+                <tr className="border-b border-brand-gray-100 dark:border-brand-gray-800 bg-brand-gray-50/50 dark:bg-brand-gray-900/50">
+                  <th className="px-6 py-4 text-xs font-bold text-brand-gray-400 uppercase tracking-wider w-24 text-center">الترتيب</th>
+                  <th className="px-6 py-4 text-xs font-bold text-brand-gray-400 uppercase tracking-wider">الاسم بالعربية</th>
+                  <th className="px-6 py-4 text-xs font-bold text-brand-gray-400 uppercase tracking-wider">الاسم بالإنجليزية</th>
+                  <th className="px-6 py-4 text-xs font-bold text-brand-gray-400 uppercase tracking-wider text-left pl-12 w-48">العمليات</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-brand-gray-100 dark:divide-brand-gray-800/50">
+                {categories.map((cat) => (
+                  <tr key={cat.id} className="hover:bg-brand-gray-50/30 dark:hover:bg-brand-gray-800/20 transition-colors">
+                    <td className="px-6 py-4 whitespace-nowrap text-center">
+                      <span className="text-xs text-brand-beige font-semibold bg-brand-beige/10 px-2.5 py-1 rounded-full">
+                        #{cat.sort_order}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-brand-black dark:text-brand-white">
+                      {cat.name_ar}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-brand-gray-500 dark:text-brand-gray-400 font-medium">
+                      {cat.name_en}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-left pl-12">
+                      <div className="flex items-center justify-end gap-1">
+                        <button
+                          onClick={() => { setEditingCategory(cat); setShowForm(true); }}
+                          className="p-2 rounded-xl hover:bg-brand-gray-100 dark:hover:bg-brand-gray-800 transition-colors"
+                          aria-label={`Edit ${cat.name_en}`}
+                        >
+                          <Pencil size={16} className="text-brand-gray-500" />
+                        </button>
+
+                        {deleteConfirm === cat.id ? (
+                          <div className="flex items-center gap-1 mr-2">
+                            <button
+                              onClick={() => handleDelete(cat.id)}
+                              className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-red-500 text-white hover:bg-red-600 transition-colors"
+                            >
+                              حذف
+                            </button>
+                            <button
+                              onClick={() => setDeleteConfirm(null)}
+                              className="px-3 py-1.5 rounded-lg text-xs font-medium text-brand-gray-500 hover:bg-brand-gray-100 dark:hover:bg-brand-gray-800 transition-colors"
+                            >
+                              إلغاء
+                            </button>
+                          </div>
+                        ) : (
+                          <button
+                            onClick={() => setDeleteConfirm(cat.id)}
+                            className="p-2 rounded-xl hover:bg-red-50 dark:hover:bg-red-900/10 transition-colors"
+                            aria-label={`Delete ${cat.name_en}`}
+                          >
+                            <Trash2 size={16} className="text-red-400" />
+                          </button>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </>
       ) : (
         <EmptyState
           title="لا توجد أقسام"

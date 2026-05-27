@@ -21,9 +21,14 @@ export function MenuSection({ section }: MenuSectionProps) {
       </div>
 
       {/* Items */}
-      <div className="divide-y divide-brand-gray-100 dark:divide-brand-gray-800/50">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-0.5">
         {section.menu_items.map((item) => (
-          <MenuItem key={item.id} item={item} />
+          <div
+            key={item.id}
+            className="border-b border-brand-gray-100/70 dark:border-brand-gray-800/40 last:border-b-0 md:[&:nth-last-child(-n+2)]:border-b-0"
+          >
+            <MenuItem item={item} />
+          </div>
         ))}
       </div>
 
