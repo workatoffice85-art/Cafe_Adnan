@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { Menu } from 'lucide-react';
 import { AdminSidebar } from '@/components/admin/AdminSidebar';
+import { usePathname } from 'next/navigation';
 
 export default function AdminLayout({
   children,
@@ -10,6 +11,13 @@ export default function AdminLayout({
   children: React.ReactNode;
 }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const pathname = usePathname();
+
+  const isLoginPage = pathname === '/admin/login';
+
+  if (isLoginPage) {
+    return <>{children}</>;
+  }
 
   return (
     <div className="min-h-screen bg-brand-gray-50 dark:bg-brand-black flex">
