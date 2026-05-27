@@ -88,13 +88,13 @@ export default function MenuClient({ initialCategories, initialItems }: MenuClie
           activeId={activeCategory}
           onSelect={handleCategorySelect}
         />
+        {/* Sticky Search Bar */}
+        <div className="max-w-lg md:max-w-2xl lg:max-w-5xl mx-auto px-4 pb-3 pt-1">
+          <SearchBar value={search} onChange={setSearch} />
+        </div>
       </div>
 
       <main className="max-w-lg md:max-w-2xl lg:max-w-5xl mx-auto px-5 pb-12">
-        {/* Search */}
-        <div className="py-4">
-          <SearchBar value={search} onChange={setSearch} />
-        </div>
 
         {/* Menu Sections */}
         {filteredSections.length > 0 ? (
