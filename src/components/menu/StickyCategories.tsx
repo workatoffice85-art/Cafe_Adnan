@@ -27,7 +27,7 @@ export function StickyCategories({ categories, activeId, onSelect }: StickyCateg
   if (categories.length === 0) return null;
 
   return (
-    <div className="sticky top-[60px] z-40 bg-brand-white/95 dark:bg-brand-black/95 backdrop-blur-sm border-b border-brand-gray-100 dark:border-brand-gray-800">
+    <div className="w-full">
       <div className="max-w-lg md:max-w-2xl lg:max-w-5xl mx-auto">
         <div
           ref={scrollRef}

@@ -22,16 +22,34 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   const [theme, setTheme] = useState<Theme>('light');
   const [mounted, setMounted] = useState(false);
 
+  // Initialize theme based on localStorage or system preference
   useEffect(() => {
     setMounted(true);
     const stored = localStorage.getItem('cafe-adnan-theme') as Theme | null;
     if (stored) {
       setTheme(stored);
-    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-      setTheme('dark');
+    } else {
+      const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      setTheme(systemDark ? 'dark' : 'light');
     }
   }, []);
 
+  // Listen to system preference changes (only sync if user hasn't set manual override)
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    
+    const handleChange = (e: MediaQueryListEvent) => {
+      const stored = localStorage.getItem('cafe-adnan-theme');
+      if (!stored) {
+        setTheme(e.matches ? 'dark' : 'light');
+      }
+    };
+
+    mediaQuery.addEventListener('change', handleChange);
+    return () => mediaQuery.removeEventListener('change', handleChange);
+  }, []);
+
+  // Update DOM when theme state changes
   useEffect(() => {
     if (!mounted) return;
     const root = document.documentElement;
@@ -40,11 +58,13 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     } else {
       root.classList.remove('dark');
     }
-    localStorage.setItem('cafe-adnan-theme', theme);
   }, [theme, mounted]);
 
+  // Toggle theme explicitly (writes to localStorage as override)
   const toggleTheme = () => {
-    setTheme((prev) => (prev === 'light' ? 'dark' : 'light'));
+    const newTheme = theme === 'light' ? 'dark' : 'light';
+    setTheme(newTheme);
+    localStorage.setItem('cafe-adnan-theme', newTheme);
   };
 
   // Prevent flash of incorrect theme

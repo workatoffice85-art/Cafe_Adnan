@@ -80,13 +80,15 @@ export default function MenuClient({ initialCategories, initialItems }: MenuClie
 
   return (
     <div className="min-h-screen bg-brand-white dark:bg-brand-black">
-      <MenuHeader />
-
-      <StickyCategories
-        categories={categories}
-        activeId={activeCategory}
-        onSelect={handleCategorySelect}
-      />
+      {/* Sticky Header Block */}
+      <div className="sticky top-0 z-50 bg-brand-white/95 dark:bg-brand-black/95 backdrop-blur-sm border-b border-brand-gray-100 dark:border-brand-gray-800">
+        <MenuHeader />
+        <StickyCategories
+          categories={categories}
+          activeId={activeCategory}
+          onSelect={handleCategorySelect}
+        />
+      </div>
 
       <main className="max-w-lg md:max-w-2xl lg:max-w-5xl mx-auto px-5 pb-12">
         {/* Search */}
