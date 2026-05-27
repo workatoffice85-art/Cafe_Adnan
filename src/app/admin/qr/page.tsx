@@ -23,32 +23,98 @@ export default function QRPage() {
     if (!card) return;
 
     try {
-      // Use html2canvas-like approach via SVG serialization
       const svgEl = card.querySelector('svg');
       if (!svgEl) return;
 
-      const svgData = new XMLSerializer().serializeToString(svgEl);
       const canvas = document.createElement('canvas');
+      canvas.width = 600;
+      canvas.height = 900;
       const ctx = canvas.getContext('2d');
-      const img = new Image();
+      if (!ctx) return;
 
-      canvas.width = 400;
-      canvas.height = 400;
+      // 1. Load brand logo first
+      const logoImg = new Image();
+      logoImg.crossOrigin = 'anonymous';
+      
+      logoImg.onload = () => {
+        // 2. Load QR Code SVG image
+        const svgData = new XMLSerializer().serializeToString(svgEl);
+        const qrImg = new Image();
+        
+        qrImg.onload = () => {
+          // --- BEGIN DRAWING ---
+          
+          // Clear with white background
+          ctx.fillStyle = '#ffffff';
+          // Draw rounded rectangle container
+          const x = 0, y = 0, width = 600, height = 900, radius = 40;
+          ctx.beginPath();
+          ctx.moveTo(x + radius, y);
+          ctx.lineTo(x + width - radius, y);
+          ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+          ctx.lineTo(x + width, y + height - radius);
+          ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+          ctx.lineTo(x + radius, y + height);
+          ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+          ctx.lineTo(x, y + radius);
+          ctx.quadraticCurveTo(x, y, x + radius, y);
+          ctx.closePath();
+          ctx.fill();
 
-      img.onload = () => {
-        if (ctx) {
-          ctx.fillStyle = 'white';
-          ctx.fillRect(0, 0, 400, 400);
-          ctx.drawImage(img, 60, 60, 280, 280);
+          // Draw a very subtle outline border
+          ctx.strokeStyle = '#f3f4f6';
+          ctx.lineWidth = 4;
+          ctx.stroke();
 
+          // Draw the Calligraphic Brand Logo (Inverted to be black on white background)
+          ctx.save();
+          ctx.filter = 'invert(100%)';
+          const logoWidth = 240;
+          const logoHeight = (logoImg.height / logoImg.width) * logoWidth;
+          ctx.drawImage(logoImg, (600 - logoWidth) / 2, 70, logoWidth, logoHeight);
+          ctx.restore();
+
+          // Draw the QR Code centered
+          const qrSize = 360;
+          ctx.drawImage(qrImg, (600 - qrSize) / 2, 280, qrSize, qrSize);
+
+          // Draw bilingual texts
+          ctx.textAlign = 'center';
+          
+          // Arabic Text
+          ctx.fillStyle = '#1f2937'; // text-gray-800
+          ctx.font = 'bold 28px Cairo, system-ui, sans-serif';
+          ctx.fillText('امسح للقائمة', 300, 700);
+
+          // English Text
+          ctx.fillStyle = '#6b7280'; // text-gray-500
+          ctx.font = '500 20px Inter, system-ui, sans-serif';
+          ctx.fillText('Scan to view menu', 300, 745);
+
+          // Divider Line
+          ctx.strokeStyle = '#f3f4f6';
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.moveTo(80, 800);
+          ctx.lineTo(520, 800);
+          ctx.stroke();
+
+          // Bottom Footer Text
+          ctx.fillStyle = '#9ca3af';
+          ctx.font = '500 16px Inter, system-ui, sans-serif';
+          ctx.fillText('C A F E   A D N A N', 300, 850);
+
+          // --- DOWNLOAD TRIGGER ---
           const link = document.createElement('a');
-          link.download = 'cafe-adnan-qr.png';
+          link.download = 'cafe-adnan-qr-card.png';
           link.href = canvas.toDataURL('image/png');
           link.click();
-        }
+        };
+
+        qrImg.src = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgData)));
       };
 
-      img.src = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgData)));
+      logoImg.src = '/logo.png';
     } catch (err) {
       console.error('Download failed:', err);
     }
