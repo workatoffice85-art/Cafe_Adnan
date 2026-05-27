@@ -13,22 +13,46 @@ jobs:
     steps:
       - name: Send keep-alive query to PostgREST API
         run: |
+          echo "Checking GitHub Secrets..."
+          
+          SUPABASE_URL="${{ secrets.SUPABASE_URL }}"
+          SUPABASE_KEY="${{ secrets.SUPABASE_ANON_KEY }}"
+          
+          if [ -z "$SUPABASE_URL" ] || [ -z "$SUPABASE_KEY" ]; then
+            echo "=========================================================================="
+            echo "❌ خـطأ: لـم يتم العثور على المتغيرات السرية (GitHub Secrets)!"
+            echo "❌ Error: SUPABASE_URL or SUPABASE_ANON_KEY is empty or missing!"
+            echo "=========================================================================="
+            echo "يرجى اتباع الخطوات التالية لحل المشكلة:"
+            echo "1. افتح مستودعك (Repository) على GitHub."
+            echo "2. اذهب إلى Settings -> Secrets and variables -> Actions."
+            echo "3. اضغط على 'New repository secret'."
+            echo "4. أضف SUPABASE_URL (الرابط الخاص بك)."
+            echo "5. أضف SUPABASE_ANON_KEY (المفتاح الخاص بك)."
+            echo "=========================================================================="
+            exit 1
+          fi
+          
           echo "Sending keep-alive request to Supabase PostgREST API..."
           
           # Clean Supabase URL by removing trailing slash if present
-          URL="${{ secrets.SUPABASE_URL }}"
-          CLEAN_URL="${URL%/}"
+          CLEAN_URL="${SUPABASE_URL%/}"
           
           STATUS_CODE=$(curl -s -o /dev/null -w "%{http_code}" \
             -X GET "$CLEAN_URL/rest/v1/categories?select=id&limit=1" \
-            -H "apikey: ${{ secrets.SUPABASE_ANON_KEY }}" \
-            -H "Authorization: Bearer ${{ secrets.SUPABASE_ANON_KEY }}")
+            -H "apikey: $SUPABASE_KEY" \
+            -H "Authorization: Bearer $SUPABASE_KEY")
           
           echo "Response Status Code: $STATUS_CODE"
           
           if [ "$STATUS_CODE" -eq 200 ] || [ "$STATUS_CODE" -eq 204 ]; then
-            echo "Successfully pinged Supabase database! Project is active."
+            echo "✅ Successfully pinged Supabase database! Project is active."
           else
-            echo "Error pinging Supabase (Status: $STATUS_CODE). Please check your secrets."
+            echo "=========================================================================="
+            echo "❌ خطأ في الاتصال بقاعدة البيانات! رمز الاستجابة: $STATUS_CODE"
+            echo "❌ Error: Connection failed with HTTP status code $STATUS_CODE"
+            echo "=========================================================================="
+            echo "يرجى التحقق من صحة الرابط والمفتاح اللذين قمت بإدخالهما في الإعدادات."
+            echo "=========================================================================="
             exit 1
           fi
