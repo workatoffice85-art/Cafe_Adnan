@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import type { Category } from '@/types/database';
 import { X } from 'lucide-react';
 import { LoadingSpinner } from '@/components/LoadingSpinner';
@@ -19,6 +19,13 @@ export function CategoryForm({ category, onSubmit, onClose }: CategoryFormProps)
   const [error, setError] = useState('');
 
   const isEditing = !!category;
+
+  useEffect(() => {
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

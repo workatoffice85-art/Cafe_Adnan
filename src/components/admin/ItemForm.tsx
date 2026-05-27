@@ -33,6 +33,13 @@ export function ItemForm({ item, onSubmit, onClose }: ItemFormProps) {
   const isEditing = !!item;
 
   useEffect(() => {
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, []);
+
+  useEffect(() => {
     async function fetchCategories() {
       const supabase = createClient();
       const { data } = await supabase.from('categories').select('*').order('sort_order');
