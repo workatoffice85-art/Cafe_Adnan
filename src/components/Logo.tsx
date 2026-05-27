@@ -4,9 +4,10 @@ interface LogoProps {
   size?: 'sm' | 'md' | 'lg';
   className?: string;
   showSubtitle?: boolean;
+  forceInvert?: boolean;
 }
 
-export function Logo({ size = 'md', className, showSubtitle = true }: LogoProps) {
+export function Logo({ size = 'md', className, showSubtitle = true, forceInvert = false }: LogoProps) {
   const sizes = {
     sm: 'h-16 md:h-18 w-auto',
     md: 'h-28 md:h-32 w-auto',
@@ -21,7 +22,7 @@ export function Logo({ size = 'md', className, showSubtitle = true }: LogoProps)
         className={clsx(
           sizes[size],
           'object-contain transition-all duration-200',
-          'invert dark:invert-0'
+          forceInvert ? 'invert' : 'invert dark:invert-0'
         )}
       />
     </div>

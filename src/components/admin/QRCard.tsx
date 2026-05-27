@@ -19,7 +19,7 @@ export function QRCard({ url }: QRCardProps) {
     >
       {/* Logo */}
       <div className="mb-6">
-        <Logo size="md" />
+        <Logo size="md" forceInvert={true} />
       </div>
 
       {/* QR Code */}
