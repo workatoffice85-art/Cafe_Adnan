@@ -1,0 +1,150 @@
+export const translations = {
+  en: {
+    brandName: 'Cafe Adnan',
+    brandSub: 'Premium Coffee Experience',
+    menu: 'Menu',
+    searchPlaceholder: 'Search for coffee, desserts, drinks...',
+    allProducts: 'All Items',
+    noItemsFound: 'No menu items match your search.',
+    currency: 'EGP',
+    backToMenu: 'Back to Menu',
+    
+    // Auth & Login
+    adminLogin: 'Admin Authentication',
+    adminLoginSub: 'Cafe Adnan Staff Portal',
+    emailLabel: 'Email Address',
+    passwordLabel: 'Password',
+    loginButton: 'Sign In securely',
+    loginError: 'Invalid credentials. Please try again.',
+    loggingIn: 'Verifying credentials...',
+    
+    // Admin Dashboard
+    dashboard: 'Dashboard',
+    dashboardTitle: 'Overview Dashboard',
+    dashboardSub: 'Manage menu items, categories, and settings',
+    totalCategories: 'Total Categories',
+    totalItems: 'Total Items',
+    availableItems: 'Available Items',
+    unavailableItems: 'Out of Stock',
+    recentItems: 'Recent Menu Items',
+    itemCol: 'Item',
+    categoryCol: 'Category',
+    priceCol: 'Price',
+    statusCol: 'Status',
+    actionsCol: 'Actions',
+    availableStatus: 'Available',
+    unavailableStatus: 'Out of stock',
+    allCategories: 'All Categories',
+    logout: 'Sign Out',
+    
+    // Management Pages
+    manageCategories: 'Manage Categories',
+    manageCategoriesSub: 'Add, edit and organize menu sections',
+    addCategory: 'Add Category',
+    editCategory: 'Edit Category',
+    categoryNameAr: 'Arabic Name',
+    categoryNameEn: 'English Name',
+    save: 'Save Changes',
+    cancel: 'Cancel',
+    deleteConfirm: 'Are you sure you want to delete this? This action cannot be undone.',
+    
+    manageItems: 'Manage Menu Items',
+    manageItemsSub: 'Add, edit and customize products and prices',
+    addItem: 'Add Menu Item',
+    editItem: 'Edit Menu Item',
+    itemNameAr: 'Arabic Name',
+    itemNameEn: 'English Name',
+    itemDescAr: 'Arabic Description (Optional)',
+    itemDescEn: 'English Description (Optional)',
+    itemPrice: 'Price (EGP)',
+    itemAvailable: 'Available for Ordering',
+    
+    // QR Card
+    qrCodeCard: 'QR Code Cards',
+    qrCodeCardSub: 'Generate printable QR codes for customer tables',
+    scanMenu: 'Scan the QR Code',
+    toViewMenu: 'to view our digital menu instantly',
+    printCard: 'Print QR Card',
+    qrDomainLabel: 'Menu Web Address',
+    
+    // Notifications & Loading
+    loading: 'Loading premium menu...',
+    successSaved: 'Successfully saved!',
+    successDeleted: 'Successfully deleted!',
+    errorOccurred: 'An error occurred. Please try again.'
+  },
+  ar: {
+    brandName: 'قهوة عدنان',
+    brandSub: 'طعم حقيقي.. تجربة مختلفة',
+    menu: 'قائمة الطعام',
+    searchPlaceholder: 'ابحث عن قهوة، حلويات، مشروبات...',
+    allProducts: 'كل المنتجات',
+    noItemsFound: 'لم يتم العثور على أصناف تطابق بحثك.',
+    currency: 'ج.م',
+    backToMenu: 'العودة للقائمة',
+    
+    // Auth & Login
+    adminLogin: 'لوحة التحكم',
+    adminLoginSub: 'بوابة تسجيل الدخول للإدارة - قهوة عدنان',
+    emailLabel: 'البريد الإلكتروني',
+    passwordLabel: 'كلمة المرور',
+    loginButton: 'تسجيل الدخول بأمان',
+    loginError: 'البيانات المدخلة غير صحيحة. يرجى المحاولة مرة أخرى.',
+    loggingIn: 'جاري التحقق من البيانات...',
+    
+    // Admin Dashboard
+    dashboard: 'لوحة التحكم',
+    dashboardTitle: 'لوحة التحكم والمتابعة',
+    dashboardSub: 'إدارة قائمة المنتجات، الأقسام، والإعدادات',
+    totalCategories: 'الأقسام',
+    totalItems: 'إجمالي المنتجات',
+    availableItems: 'المنتجات المتاحة',
+    unavailableItems: 'غير متاحة',
+    recentItems: 'المنتجات المضافة حديثاً',
+    itemCol: 'المنتج',
+    categoryCol: 'القسم',
+    priceCol: 'السعر',
+    statusCol: 'الحالة',
+    actionsCol: 'الإجراءات',
+    availableStatus: 'متاح',
+    unavailableStatus: 'غير متاح',
+    allCategories: 'كل الأقسام',
+    logout: 'تسجيل الخروج',
+    
+    // Management Pages
+    manageCategories: 'إدارة الأقسام',
+    manageCategoriesSub: 'إضافة وتعديل وترتيب أقسام القائمة الرئيسية',
+    addCategory: 'إضافة قسم جديد',
+    editCategory: 'تعديل القسم',
+    categoryNameAr: 'الاسم بالعربية',
+    categoryNameEn: 'الاسم بالإنجليزية',
+    save: 'حفظ التغييرات',
+    cancel: 'إلغاء',
+    deleteConfirm: 'هل أنت متأكد من الحذف؟ لا يمكن التراجع عن هذا الإجراء.',
+    
+    manageItems: 'إدارة المنتجات',
+    manageItemsSub: 'إضافة وتعديل وتخصيص قائمة المنتجات والأسعار',
+    addItem: 'إضافة منتج جديد',
+    editItem: 'تعديل المنتج',
+    itemNameAr: 'الاسم بالعربية',
+    itemNameEn: 'الاسم بالإنجليزية',
+    itemDescAr: 'الوصف بالعربية (اختياري)',
+    itemDescEn: 'الوصف بالإنجليزية (اختياري)',
+    itemPrice: 'السعر (ج.م)',
+    itemAvailable: 'متاح للطلب الآن',
+    
+    // QR Card
+    qrCodeCard: 'بطاقات الـ QR',
+    qrCodeCardSub: 'توليد بطاقات الـ QR جاهزة للطباعة وتوزيعها على الطاولات',
+    scanMenu: 'امسح الكود',
+    toViewMenu: 'لعرض القائمة الرقمية مباشرة على هاتفك',
+    printCard: 'طباعة البطاقة',
+    qrDomainLabel: 'رابط قائمة الطعام الإلكتروني',
+    
+    // Notifications & Loading
+    loading: 'جاري تحميل قائمة الطعام الفاخرة...',
+    successSaved: 'تم الحفظ بنجاح!',
+    successDeleted: 'تم الحذف بنجاح!',
+    errorOccurred: 'حدث خطأ ما. يرجى المحاولة مرة أخرى.'
+  }
+};
