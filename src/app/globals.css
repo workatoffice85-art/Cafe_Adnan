@@ -1,6 +1,8 @@
 @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
 @import "tailwindcss";
 
+@variant dark (&:where(.dark, .dark *));
+
 @theme {
   --color-brand-black: #0a0a0a;
   --color-brand-white: #fafafa;
@@ -49,8 +51,28 @@ body {
 
 .dark body,
 .dark {
-  background-color: var(--color-brand-black);
-  color: var(--color-brand-white);
+  background-color: var(--color-brand-black) !important;
+  color: var(--color-brand-white) !important;
+}
+
+.dark .bg-brand-white {
+  background-color: var(--color-brand-black) !important;
+}
+
+.dark .bg-brand-white\/95 {
+  background-color: rgba(10, 10, 10, 0.95) !important;
+}
+
+.dark .text-brand-black {
+  color: var(--color-brand-white) !important;
+}
+
+.dark .border-brand-gray-100 {
+  border-color: var(--color-brand-gray-800) !important;
+}
+
+.dark .divide-brand-gray-100 > * + * {
+  border-color: var(--color-brand-gray-800) !important;
 }
 
 /* ========================================
