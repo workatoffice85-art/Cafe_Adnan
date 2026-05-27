@@ -1,0 +1,208 @@
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --color-brand-black: #0a0a0a;
+  --color-brand-white: #fafafa;
+  --color-brand-beige: #C8A97E;
+  --color-brand-beige-light: #E8D5B7;
+  --color-brand-beige-dark: #A88B5E;
+  --color-brand-gold: #B8860B;
+  --color-brand-gray-50: #f9f9f9;
+  --color-brand-gray-100: #f0f0f0;
+  --color-brand-gray-200: #e4e4e4;
+  --color-brand-gray-300: #d1d1d1;
+  --color-brand-gray-400: #a0a0a0;
+  --color-brand-gray-500: #6b6b6b;
+  --color-brand-gray-600: #4a4a4a;
+  --color-brand-gray-700: #333333;
+  --color-brand-gray-800: #1f1f1f;
+  --color-brand-gray-900: #141414;
+
+  --font-cairo: 'Cairo', sans-serif;
+  --font-ibm: 'IBM Plex Sans Arabic', sans-serif;
+  --font-inter: 'Inter', sans-serif;
+}
+
+/* ========================================
+   Base Styles
+   ======================================== */
+
+html {
+  scroll-behavior: smooth;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  font-family: var(--font-cairo), var(--font-inter), sans-serif;
+  background-color: var(--color-brand-white);
+  color: var(--color-brand-black);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+/* ========================================
+   Dark Mode
+   ======================================== */
+
+.dark body,
+.dark {
+  background-color: var(--color-brand-black);
+  color: var(--color-brand-white);
+}
+
+/* ========================================
+   Scrollbar
+   ======================================== */
+
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-brand-gray-300);
+  border-radius: 999px;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: var(--color-brand-gray-700);
+}
+
+/* ========================================
+   Selection
+   ======================================== */
+
+::selection {
+  background-color: var(--color-brand-beige);
+  color: var(--color-brand-black);
+}
+
+/* ========================================
+   Menu Item Dots
+   ======================================== */
+
+.menu-dots {
+  flex: 1;
+  border-bottom: 1.5px dotted var(--color-brand-gray-300);
+  margin: 0 12px;
+  min-width: 20px;
+  position: relative;
+  top: -4px;
+}
+
+.dark .menu-dots {
+  border-bottom-color: var(--color-brand-gray-700);
+}
+
+/* ========================================
+   Category Tabs Scrollbar Hidden
+   ======================================== */
+
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* ========================================
+   Focus Styles
+   ======================================== */
+
+*:focus-visible {
+  outline: 2px solid var(--color-brand-beige);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* ========================================
+   Input Styles
+   ======================================== */
+
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+input[type="search"],
+select,
+textarea {
+  font-family: var(--font-cairo), var(--font-inter), sans-serif;
+}
+
+/* ========================================
+   Animations
+   ======================================== */
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(100%); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes slideOutRight {
+  from { opacity: 1; transform: translateX(0); }
+  to { opacity: 0; transform: translateX(100%); }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.3s ease-out forwards;
+}
+
+.animate-slideUp {
+  animation: slideUp 0.3s ease-out forwards;
+}
+
+.animate-slideInRight {
+  animation: slideInRight 0.3s ease-out forwards;
+}
+
+.animate-slideOutRight {
+  animation: slideOutRight 0.3s ease-out forwards;
+}
+
+/* ========================================
+   Touch-friendly
+   ======================================== */
+
+@media (hover: none) {
+  button, a, [role="button"] {
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+/* ========================================
+   Print Styles (QR Card)
+   ======================================== */
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  
+  .print-only {
+    display: block !important;
+  }
+  
+  body {
+    background: white !important;
+    color: black !important;
+  }
+}

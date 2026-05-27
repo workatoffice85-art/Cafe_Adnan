@@ -1,36 +1,116 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Cafe Adnan | قهوة عدنان
+
+Premium QR menu web application for Cafe Adnan. Customers scan a QR code to instantly access an elegant digital menu on their phones.
+
+## Tech Stack
+
+- **Framework**: Next.js 15 (App Router)
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS v4
+- **Database**: Supabase (PostgreSQL)
+- **Auth**: Supabase Auth
+- **Realtime**: Supabase Realtime
+- **Deployment**: Vercel
 
 ## Getting Started
 
-First, run the development server:
+### 1. Clone & Install
+
+```bash
+npm install
+```
+
+### 2. Set Up Supabase
+
+1. Create a new project at [supabase.com](https://supabase.com)
+2. Go to SQL Editor and run the contents of `supabase/schema.sql`
+3. Go to Authentication > Settings and enable Email auth
+4. Create an admin user in Authentication > Users
+
+### 3. Configure Environment
+
+Copy `.env.local.example` to `.env.local` and fill in your Supabase credentials:
+
+```bash
+cp .env.local.example .env.local
+```
+
+```env
+NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+NEXT_PUBLIC_SITE_URL=http://localhost:3000
+```
+
+### 4. Run Development Server
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Visit:
+- **Menu**: http://localhost:3000/menu
+- **Admin**: http://localhost:3000/admin/login
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Deployment on Vercel
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### 1. Push to GitHub
 
-## Learn More
+```bash
+git add .
+git commit -m "Initial commit"
+git push
+```
 
-To learn more about Next.js, take a look at the following resources:
+### 2. Import on Vercel
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+1. Go to [vercel.com](https://vercel.com) and import your repository
+2. Add environment variables:
+   - `NEXT_PUBLIC_SUPABASE_URL`
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+   - `NEXT_PUBLIC_SITE_URL` (your Vercel domain)
+3. Deploy!
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### 3. Update QR Codes
 
-## Deploy on Vercel
+After deployment, update the QR code URL in Admin > QR Code to your production domain.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Project Structure
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```
+src/
+├── app/              # Next.js App Router pages
+│   ├── menu/         # Customer menu (public)
+│   └── admin/        # Admin dashboard (protected)
+├── components/       # Reusable UI components
+│   ├── menu/         # Menu-specific components
+│   └── admin/        # Admin-specific components
+├── hooks/            # Custom React hooks
+├── lib/              # Supabase clients
+├── providers/        # Context providers
+├── services/         # Data access layer
+└── types/            # TypeScript types
+```
+
+## Features
+
+### Customer Menu
+- ✅ Instant QR scan → menu access
+- ✅ Sticky category navigation
+- ✅ Bilingual (Arabic/English)
+- ✅ Real-time menu updates
+- ✅ Fast search
+- ✅ Dark mode
+- ✅ Mobile-first design
+
+### Admin Dashboard
+- ✅ Secure authentication
+- ✅ Category management (CRUD)
+- ✅ Menu item management (CRUD)
+- ✅ Availability toggling
+- ✅ QR code generation
+- ✅ Mobile-friendly admin
+- ✅ Real-time sync
+
+## License
+
+Private — Cafe Adnan © 2025
