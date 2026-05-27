@@ -2,7 +2,7 @@
 
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
-import { LayoutDashboard, FolderOpen, UtensilsCrossed, QrCode, X, LogOut } from 'lucide-react';
+import { LayoutDashboard, FolderOpen, UtensilsCrossed, QrCode, X, LogOut, Receipt } from 'lucide-react';
 import { Logo } from '@/components/Logo';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { createClient } from '@/lib/supabase/client';
@@ -18,6 +18,7 @@ const navItems = [
   { href: '/admin/dashboard', label: 'لوحة التحكم', labelEn: 'Dashboard', icon: LayoutDashboard },
   { href: '/admin/categories', label: 'الأقسام', labelEn: 'Categories', icon: FolderOpen },
   { href: '/admin/items', label: 'المنتجات', labelEn: 'Items', icon: UtensilsCrossed },
+  { href: '/admin/debts', label: 'المديونيات', labelEn: 'Debts', icon: Receipt },
   { href: '/admin/qr', label: 'رمز QR', labelEn: 'QR Code', icon: QrCode },
 ];
 

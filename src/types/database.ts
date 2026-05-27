@@ -21,4 +21,15 @@ export interface CategoryWithItems extends Category {
   menu_items: MenuItem[];
 }
 
+export interface Debt {
+  id: string;
+  customer_name: string;
+  description: string;
+  total_amount: number;
+  paid_amount: number;
+  remaining_amount: number;
+  created_at: string;
+  updated_at: string;
+}
+
 export type Language = 'ar' | 'en';
