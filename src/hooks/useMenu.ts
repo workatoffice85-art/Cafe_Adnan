@@ -15,8 +15,8 @@ export function useMenu(initialCategories?: Category[], initialItems?: MenuItem[
       const supabase = createClient();
 
       const [catResult, itemResult] = await Promise.all([
-        supabase.from('categories').select('*').order('sort_order'),
-        supabase.from('menu_items').select('*').order('sort_order'),
+        supabase.from('categories').select('*').order('sort_order').order('created_at'),
+        supabase.from('menu_items').select('*').order('sort_order').order('created_at'),
       ]);
 
       if (catResult.error) throw catResult.error;

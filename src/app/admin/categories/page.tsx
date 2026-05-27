@@ -21,7 +21,8 @@ export default function CategoriesPage() {
     const { data } = await supabase
       .from('categories')
       .select('*')
-      .order('sort_order');
+      .order('sort_order')
+      .order('created_at');
     setCategories(data || []);
     setLoading(false);
   }, [supabase]);

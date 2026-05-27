@@ -23,8 +23,8 @@ export default function ItemsPage() {
 
   const fetchData = useCallback(async () => {
     const [itemResult, catResult] = await Promise.all([
-      supabase.from('menu_items').select('*').order('sort_order'),
-      supabase.from('categories').select('*').order('sort_order'),
+      supabase.from('menu_items').select('*').order('sort_order').order('created_at'),
+      supabase.from('categories').select('*').order('sort_order').order('created_at'),
     ]);
     setItems(itemResult.data || []);
     setCategories(catResult.data || []);
