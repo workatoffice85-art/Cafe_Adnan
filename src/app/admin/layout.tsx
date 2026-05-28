@@ -31,6 +31,23 @@ export default function AdminLayout({
 
   useEffect(() => {
     async function checkAuth() {
+      // 0. Automatically redirect legacy devices immediately to the Lite Node.js Admin Portal if configured
+      const isLegacyDevice = () => {
+        if (typeof window === 'undefined') return false;
+        const ua = window.navigator.userAgent;
+        const isLegacyIOS = /iPhone OS (?:[0-9]|1[0-5])_/i.test(ua) || /iPad.*OS (?:[0-9]|1[0-5])_/i.test(ua);
+        const isLegacySafari = /Version\/(?:[0-9]|1[0-5])\.[0-9]+(\.[0-9]+)*.*Safari/i.test(ua);
+        return isLegacyIOS || isLegacySafari;
+      };
+
+      if (isLegacyDevice()) {
+        const liteAdminUrl = process.env.NEXT_PUBLIC_LITE_ADMIN_URL;
+        if (liteAdminUrl) {
+          window.location.href = liteAdminUrl;
+          return;
+        }
+      }
+
       if (isLoginPage) {
         setAuthLoading(false);
         return;

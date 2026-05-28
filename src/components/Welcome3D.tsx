@@ -61,15 +61,21 @@ export default function Welcome3D() {
       if (typeof window === 'undefined') return false;
       const ua = window.navigator.userAgent;
       
+      // 1. Detect legacy iOS (< 16)
       const isLegacyIOS = /iPhone OS (?:[0-9]|1[0-5])_/i.test(ua) || /iPad.*OS (?:[0-9]|1[0-5])_/i.test(ua);
+      
+      // 2. Detect legacy Safari/WebKit (< 16)
       const isLegacySafari = /Version\/(?:[0-9]|1[0-5])\.[0-9]+(\.[0-9]+)*.*Safari/i.test(ua);
       
+      // 3. Check for legacy media listener APIs (only for Safari browser engines where matchMedia is active)
       let isMediaLegacy = false;
       try {
         const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-        isMediaLegacy = typeof mediaQuery.addEventListener !== 'function';
+        if (mediaQuery && typeof mediaQuery.addEventListener !== 'function') {
+          isMediaLegacy = true;
+        }
       } catch (e) {
-        isMediaLegacy = true;
+        isMediaLegacy = false; // Fallback to false to prevent false positives in modern WebViews
       }
       
       return isLegacyIOS || isLegacySafari || isMediaLegacy;
@@ -77,6 +83,15 @@ export default function Welcome3D() {
 
     const isLegacy = checkIsLegacy();
     setIsLite(isLegacy);
+
+    // Automatically redirect legacy devices immediately to the Lite Node.js Portal if configured
+    if (isLegacy) {
+      const liteUrl = process.env.NEXT_PUBLIC_LITE_URL;
+      if (liteUrl) {
+        window.location.href = liteUrl;
+        return;
+      }
+    }
 
     const timer = setTimeout(() => {
       setMounted(true);

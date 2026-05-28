@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>لوحة التحكم | Cafe Adnan Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #070403;
+            --card-bg: rgba(16, 10, 8, 0.85);
+            --text: #fdfbf7;
+            --beige: #C8A97E;
+            --gold: #B8860B;
+            --border: rgba(200, 169, 126, 0.2);
+            --gray: #8c827d;
+            --danger: #ef4444;
+            --success: #10b981;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: 'Cairo', 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        header {
+            background: rgba(7, 4, 3, 0.9);
+            border-bottom: 1px solid var(--border);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-title {
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--gold);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-size: 12px;
+            color: var(--gray);
+        }
+
+        .logout-btn {
+            background: none;
+            border: 1px solid var(--danger);
+            color: var(--danger);
+            padding: 6px 14px;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 12px;
+            transition: all 0.2s;
+        }
+
+        .logout-btn:hover {
+            background: rgba(239, 68, 68, 0.1);
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 24px 20px 80px;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            border: 1px solid var(--border);
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 16px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--beige);
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: var(--gray);
+            font-weight: 600;
+        }
+
+        /* Section Cards */
+        .section-card {
+            border: 1px solid var(--border);
+            background: var(--card-bg);
+            border-radius: 24px;
+            padding: 24px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        h2 {
+            font-size: 18px;
+            font-weight: 800;
+            margin: 0 0 20px;
+            color: var(--beige);
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 10px;
+        }
+
+        /* Forms styling */
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        label {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--gray);
+        }
+
+        input, select, textarea {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 10px 14px;
+            font-size: 13px;
+            color: var(--text);
+            font-family: inherit;
+            outline: none;
+            box-sizing: border-box;
+            width: 100%;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            border-color: var(--gold);
+        }
+
+        .btn {
+            background: var(--beige);
+            color: var(--bg);
+            border: none;
+            border-radius: 12px;
+            padding: 10px 18px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        /* Dynamic lists */
+        .list-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 16px;
+            font-size: 13px;
+        }
+
+        .list-table th, .list-table td {
+            padding: 12px;
+            text-align: right;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .list-table th {
+            color: var(--gray);
+            font-weight: 600;
+            font-size: 11px;
+            text-transform: uppercase;
+        }
+
+        .badge {
+            display: inline-block;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 8px;
+        }
+
+        .badge-success {
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--success);
+        }
+
+        .badge-danger {
+            background: rgba(239, 68, 68, 0.15);
+            color: var(--danger);
+        }
+
+        .action-cell {
+            display: flex;
+            gap: 8px;
+            justify-content: flex-end;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header>
+        <div class="header-title">لوحة التحكم • Cafe Adnan Lite</div>
+        <div class="user-info">
+            <span>مرحباً، <%= email %></span>
+            <a href="/admin/logout" class="logout-btn">تسجيل الخروج</a>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- Stats -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value"><%= categories.length %></div>
+                <div class="stat-label">أقسام القائمة</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value"><%= items.length %></div>
+                <div class="stat-label">إجمالي المنتجات</div>
+            </div>
+        </div>
+
+        <!-- 1. CATEGORY MANAGEMENT -->
+        <div class="section-card">
+            <h2>إدارة الأقسام (Categories)</h2>
+            
+            <!-- Create Category Form -->
+            <form action="/admin/categories/create" method="POST" style="margin-bottom: 24px;">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>الاسم بالعربية</label>
+                        <input type="text" name="name_ar" required placeholder="مثال: قهوة ساخنة">
+                    </div>
+                    <div class="form-group">
+                        <label>الاسم بالإنجليزية</label>
+                        <input type="text" name="name_en" required placeholder="Example: Hot Coffee" dir="ltr">
+                    </div>
+                    <div class="form-group">
+                        <label>الترتيب</label>
+                        <input type="number" name="sort_order" required value="0" placeholder="0">
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-success">إضافة قسم جديد +</button>
+            </form>
+
+            <!-- Categories List Table -->
+            <table class="list-table">
+                <thead>
+                    <tr>
+                        <th>الاسم بالعربية</th>
+                        <th>الاسم بالإنجليزية</th>
+                        <th>الترتيب</th>
+                        <th>الإجراءات</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% categories.forEach(cat => { %>
+                        <tr>
+                            <form action="/admin/categories/update/<%= cat.id %>" method="POST">
+                                <td>
+                                    <input type="text" name="name_ar" value="<%= cat.name_ar %>" required style="padding: 6px;">
+                                </td>
+                                <td>
+                                    <input type="text" name="name_en" value="<%= cat.name_en %>" required style="padding: 6px;" dir="ltr">
+                                </td>
+                                <td>
+                                    <input type="number" name="sort_order" value="<%= cat.sort_order %>" required style="width: 70px; padding: 6px;">
+                                </td>
+                                <td class="action-cell">
+                                    <button type="submit" class="btn" style="padding: 6px 12px; font-size: 11px;">تعديل ✓</button>
+                                    <button type="submit" formaction="/admin/categories/delete/<%= cat.id %>" class="btn btn-danger" style="padding: 6px 12px; font-size: 11px;" onclick="return confirm('هل أنت متأكد من حذف هذا القسم؟')">حذف ✗</button>
+                                </td>
+                            </form>
+                        </tr>
+                    <% }) %>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 2. ITEM MANAGEMENT -->
+        <div class="section-card">
+            <h2>إدارة المنتجات (Menu Items)</h2>
+
+            <!-- Create Menu Item Form -->
+            <form action="/admin/items/create" method="POST" style="margin-bottom: 24px;">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>القسم</label>
+                        <select name="category_id" required>
+                            <option value="">اختر القسم...</option>
+                            <% categories.forEach(cat => { %>
+                                <option value="<%= cat.id %>"><%= cat.name_ar %></option>
+                            <% }) %>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>الاسم بالعربية</label>
+                        <input type="text" name="name_ar" required placeholder="مثال: كابتشينو">
+                    </div>
+                    <div class="form-group">
+                        <label>الاسم بالإنجليزية</label>
+                        <input type="text" name="name_en" required placeholder="Example: Cappuccino" dir="ltr">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>السعر (EGP)</label>
+                        <input type="number" step="0.01" name="price" required placeholder="45.00">
+                    </div>
+                    <div class="form-group">
+                        <label>الترتيب</label>
+                        <input type="number" name="sort_order" required value="0" placeholder="0">
+                    </div>
+                    <div class="form-group">
+                        <label>الحالة</label>
+                        <select name="available" required>
+                            <option value="true">متاح (متوفر)</option>
+                            <option value="false">غير متاح (نفذت الكمية)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group" style="grid-column: span 2;">
+                        <label>الوصف بالعربية (اختياري)</label>
+                        <textarea name="description_ar" placeholder="الوصف والتحضير..." style="height: 60px;"></textarea>
+                    </div>
+                    <div class="form-group" style="grid-column: span 2;">
+                        <label>الوصف بالإنجليزية (اختياري)</label>
+                        <textarea name="description_en" placeholder="Description..." style="height: 60px;" dir="ltr"></textarea>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-success">إضافة منتج جديد +</button>
+            </form>
+
+            <!-- Items List Table -->
+            <table class="list-table">
+                <thead>
+                    <tr>
+                        <th>الاسم بالعربية</th>
+                        <th>القسم</th>
+                        <th>السعر</th>
+                        <th>الحالة</th>
+                        <th>الترتيب</th>
+                        <th>الإجراءات</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% items.forEach(item => { %>
+                        <tr>
+                            <form action="/admin/items/update/<%= item.id %>" method="POST">
+                                <td>
+                                    <div style="font-weight: 700;"><%= item.name_ar %></div>
+                                    <div style="font-size: 10px; opacity: 0.5; font-family: 'Inter';"><%= item.name_en %></div>
+                                </td>
+                                <td>
+                                    <select name="category_id" required style="padding: 4px; font-size: 12px; width: 120px;">
+                                        <% categories.forEach(cat => { %>
+                                            <option value="<%= cat.id %>" <%= item.category_id === cat.id ? 'selected' : '' %>><%= cat.name_ar %></option>
+                                        <% }) %>
+                                    </select>
+                                </td>
+                                <td>
+                                    <input type="number" step="0.01" name="price" value="<%= item.price %>" required style="width: 70px; padding: 4px;">
+                                </td>
+                                <td>
+                                    <select name="available" required style="padding: 4px; font-size: 11px; width: 90px;">
+                                        <option value="true" <%= item.available ? 'selected' : '' %>>متاح</option>
+                                        <option value="false" <%= !item.available ? 'selected' : '' %>>غير متاح</option>
+                                    </select>
+                                </td>
+                                <td>
+                                    <input type="number" name="sort_order" value="<%= item.sort_order %>" required style="width: 50px; padding: 4px;">
+                                </td>
+                                <td class="action-cell">
+                                    <button type="submit" class="btn" style="padding: 6px 12px; font-size: 11px;">تعديل ✓</button>
+                                    <button type="submit" formaction="/admin/items/delete/<%= item.id %>" class="btn btn-danger" style="padding: 6px 12px; font-size: 11px;" onclick="return confirm('هل أنت متأكد من حذف هذا المنتج؟')">حذف ✗</button>
+                                </td>
+                            </form>
+                        </tr>
+                    <% }) %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</body>
+</html>

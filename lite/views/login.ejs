@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>تسجيل الدخول | Cafe Adnan Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #070403;
+            --card-bg: rgba(16, 10, 8, 0.85);
+            --text: #fdfbf7;
+            --beige: #C8A97E;
+            --gold: #B8860B;
+            --border: rgba(200, 169, 126, 0.2);
+            --gray: #8c827d;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: 'Cairo', 'Inter', sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .login-card {
+            width: 100%;
+            max-width: 380px;
+            padding: 40px 24px;
+            border: 1px solid var(--border);
+            background: var(--card-bg);
+            border-radius: 28px;
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            margin: 20px;
+        }
+
+        .logo-img {
+            height: 80px;
+            width: auto;
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            font-size: 22px;
+            font-weight: 800;
+            margin: 0 0 8px;
+            color: var(--beige);
+        }
+
+        .subtitle {
+            font-size: 12px;
+            color: var(--gray);
+            margin-bottom: 30px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .form-group {
+            text-align: right;
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--gray);
+            margin-bottom: 8px;
+            padding-right: 4px;
+        }
+
+        input {
+            width: 100%;
+            box-sizing: border-box;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 14px 16px;
+            font-size: 14px;
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            outline: none;
+            transition: all 0.25s;
+        }
+
+        input:focus {
+            border-color: var(--gold);
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        .error-banner {
+            background: rgba(239, 68, 68, 0.15);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            font-size: 12px;
+            font-weight: 600;
+            padding: 12px;
+            border-radius: 14px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .submit-btn {
+            width: 100%;
+            background: var(--beige);
+            color: var(--bg);
+            border: none;
+            border-radius: 14px;
+            padding: 14px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: 10px;
+        }
+
+        .submit-btn:active {
+            transform: scale(0.98);
+            opacity: 0.9;
+        }
+
+        .footer-text {
+            font-size: 11px;
+            color: var(--gray);
+            margin-top: 35px;
+            letter-spacing: 0.5px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="login-card">
+        <!-- Logo -->
+        <img src="/logo.png" alt="Cafe Adnan Logo" class="logo-img">
+        <h2>تسجيل الدخول</h2>
+        <div class="subtitle">لوحة التحكم • Cafe Adnan Lite</div>
+
+        <!-- Form -->
+        <form action="/admin/login" method="POST">
+            <% if (error) { %>
+                <div class="error-banner">
+                    <%= error %>
+                </div>
+            <% } %>
+
+            <div class="form-group">
+                <label for="email">البريد الإلكتروني</label>
+                <input type="email" id="email" name="email" required placeholder="admin@cafeadnan.com" dir="ltr">
+            </div>
+
+            <div class="form-group">
+                <label for="password">كلمة المرور</label>
+                <input type="password" id="password" name="password" required placeholder="••••••••" dir="ltr">
+            </div>
+
+            <button type="submit" class="submit-btn">تسجيل الدخول</button>
+        </form>
+
+        <div class="footer-text">
+            جميع الحقوق محفوظة © <%= new Date().getFullYear() %>
+        </div>
+    </div>
+
+</body>
+</html>

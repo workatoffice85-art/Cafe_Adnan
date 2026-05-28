@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>قائمة الطعام | Cafe Adnan</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #070403;
+            --bg-light: #F5EFEB;
+            --card-dark: rgba(16, 10, 8, 0.85);
+            --card-light: rgba(255, 255, 255, 0.85);
+            --text-dark: #fdfbf7;
+            --text-light: #1c130e;
+            --beige-dark: #C8A97E;
+            --beige-light: #A88B5E;
+            --gold: #B8860B;
+            --border-dark: rgba(200, 169, 126, 0.25);
+            --border-light: rgba(168, 139, 94, 0.25);
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Cairo', 'Inter', sans-serif;
+            transition: background-color 0.5s ease, color 0.5s ease;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Dark Theme Default */
+        body.dark {
+            background-color: var(--bg-dark);
+            color: var(--text-dark);
+        }
+
+        body.light {
+            background-color: var(--bg-light);
+            color: var(--text-light);
+        }
+
+        /* Glass Header */
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 20px;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid;
+            transition: all 0.3s;
+        }
+
+        body.dark header {
+            background: rgba(7, 4, 3, 0.8);
+            border-color: var(--border-dark);
+        }
+
+        body.light header {
+            background: rgba(245, 239, 235, 0.8);
+            border-color: var(--border-light);
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo-img {
+            height: 38px;
+            width: auto;
+            object-contain: contain;
+        }
+
+        body.light .logo-img {
+            filter: invert(1);
+        }
+
+        .logo-text {
+            font-size: 18px;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            color: var(--gold);
+        }
+
+        .theme-toggle-btn {
+            background: none;
+            border: 1px solid;
+            padding: 8px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        body.dark .theme-toggle-btn {
+            border-color: var(--border-dark);
+            color: var(--beige-dark);
+        }
+
+        body.light .theme-toggle-btn {
+            border-color: var(--border-light);
+            color: var(--beige-light);
+        }
+
+        .theme-toggle-btn:active {
+            transform: scale(0.95);
+        }
+
+        /* Horizontal Category Scroller */
+        .category-scroller {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding: 15px 20px;
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .category-scroller::-webkit-scrollbar {
+            display: none;
+        }
+
+        .cat-tab {
+            white-space: nowrap;
+            padding: 8px 18px;
+            border-radius: 25px;
+            font-size: 13px;
+            font-weight: 700;
+            text-decoration: none;
+            border: 1px solid transparent;
+            transition: all 0.25s;
+        }
+
+        body.dark .cat-tab {
+            background: rgba(255, 255, 255, 0.03);
+            color: var(--text-dark);
+            border-color: rgba(255, 255, 255, 0.05);
+        }
+
+        body.light .cat-tab {
+            background: rgba(0, 0, 0, 0.03);
+            color: var(--text-light);
+            border-color: rgba(0, 0, 0, 0.05);
+        }
+
+        body.dark .cat-tab.active {
+            background: var(--beige-dark);
+            color: var(--bg-dark);
+            box-shadow: 0 0 15px rgba(200, 169, 126, 0.2);
+        }
+
+        body.light .cat-tab.active {
+            background: var(--text-light);
+            color: var(--bg-light);
+        }
+
+        /* Menu Content Area */
+        .menu-container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 10px 20px 80px;
+        }
+
+        .category-section {
+            margin-bottom: 35px;
+            scroll-margin-top: 80px;
+        }
+
+        .section-header {
+            font-size: 20px;
+            font-weight: 800;
+            border-bottom: 2px solid;
+            padding-bottom: 6px;
+            margin-bottom: 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        body.dark .section-header {
+            border-color: var(--border-dark);
+            color: var(--beige-dark);
+        }
+
+        body.light .section-header {
+            border-color: var(--border-light);
+            color: var(--beige-light);
+        }
+
+        /* Menu Items */
+        .item-card {
+            border: 1px solid;
+            border-radius: 20px;
+            padding: 16px;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            gap: 15px;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            transition: all 0.25s;
+        }
+
+        body.dark .item-card {
+            background: var(--card-dark);
+            border-color: rgba(255, 255, 255, 0.04);
+        }
+
+        body.light .item-card {
+            background: var(--card-light);
+            border-color: rgba(0, 0, 0, 0.04);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+        }
+
+        .item-details {
+            flex: 1;
+            display: flex;
+            flex-col: column;
+            justify-content: space-between;
+        }
+
+        .item-title-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+        .item-name {
+            font-size: 16px;
+            font-weight: 700;
+            margin: 0 0 4px;
+        }
+
+        .item-name-en {
+            font-size: 11px;
+            font-weight: 600;
+            opacity: 0.6;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-family: 'Inter', sans-serif;
+            margin-bottom: 8px;
+        }
+
+        .item-price {
+            font-size: 16px;
+            font-weight: 800;
+            color: var(--gold);
+            white-space: nowrap;
+        }
+
+        .item-desc {
+            font-size: 12px;
+            line-height: 1.5;
+            opacity: 0.8;
+            margin: 0;
+        }
+
+        .out-of-stock {
+            opacity: 0.5;
+            filter: grayscale(1);
+        }
+
+        .stock-badge {
+            background: rgba(220, 38, 38, 0.15);
+            color: #ef4444;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 12px;
+            align-self: flex-start;
+            margin-top: 8px;
+        }
+
+        /* Arabic styling tags */
+        .footer {
+            text-align: center;
+            padding: 30px 20px;
+            font-size: 11px;
+            opacity: 0.5;
+            letter-spacing: 0.5px;
+        }
+    </style>
+</head>
+<body class="<%= theme %>">
+
+    <!-- Header -->
+    <header>
+        <div class="logo-container">
+            <img src="/logo.png" alt="Cafe Adnan Logo" class="logo-img">
+            <span class="logo-text">قهوة عدنان</span>
+        </div>
+        <a href="/toggle-theme" class="theme-toggle-btn">
+            <%= theme === 'dark' ? '☀️ وضع النهار' : '🌙 وضع الليل' %>
+        </a>
+    </header>
+
+    <!-- Categories horizontal menu -->
+    <div class="category-scroller">
+        <% categories.forEach((cat, index) => { %>
+            <a href="#cat-<%= cat.id %>" class="cat-tab <%= index === 0 ? 'active' : '' %>" onclick="activateTab(this)">
+                <%= cat.name_ar %>
+            </a>
+        <% }) %>
+    </div>
+
+    <!-- Main Container -->
+    <div class="menu-container">
+        <% categories.forEach(cat => { %>
+            <div class="category-section" id="cat-<%= cat.id %>">
+                <div class="section-header">
+                    <span><%= cat.name_ar %></span>
+                    <span style="font-size: 12px; font-weight: 600; opacity: 0.5; font-family: 'Inter'"><%= cat.name_en %></span>
+                </div>
+
+                <!-- Category Menu Items -->
+                <% const catItems = itemsByCategory[cat.id] || []; %>
+                <% if (catItems.length === 0) { %>
+                    <p style="text-align: center; font-size: 13px; opacity: 0.5; padding: 20px;">قريباً...</p>
+                <% } else { %>
+                    <% catItems.forEach(item => { %>
+                        <div class="item-card <%= !item.available ? 'out-of-stock' : '' %>">
+                            <div class="item-details">
+                                <div>
+                                    <div class="item-title-row">
+                                        <h3 class="item-name"><%= item.name_ar %></h3>
+                                        <span class="item-price"><%= item.price %> EGP</span>
+                                    </div>
+                                    <div class="item-name-en"><%= item.name_en %></div>
+                                    <% if (item.description_ar) { %>
+                                        <p class="item-desc"><%= item.description_ar %></p>
+                                    <% } %>
+                                </div>
+                                <% if (!item.available) { %>
+                                    <span class="stock-badge">نفذت الكمية</span>
+                                <% } %>
+                            </div>
+                        </div>
+                    <% }) %>
+                <% } %>
+            </div>
+        <% }) %>
+
+        <div class="footer">
+            Cafe Adnan • قهوة عدنان © <%= new Date().getFullYear() %>
+        </div>
+    </div>
+
+    <script>
+        function activateTab(tab) {
+            // Deactivate other tabs
+            document.querySelectorAll('.cat-tab').forEach(t => t.classList.remove('active'));
+            // Activate current tab
+            tab.classList.add('active');
+        }
+
+        // Scroll highlight helper
+        window.addEventListener('scroll', () => {
+            const sections = document.querySelectorAll('.category-section');
+            const scrollPos = window.scrollY + 100;
+
+            sections.forEach(sec => {
+                if (scrollPos >= sec.offsetTop && scrollPos < (sec.offsetTop + sec.offsetHeight)) {
+                    const id = sec.getAttribute('id');
+                    const tab = document.querySelector(`.cat-tab[href="#${id}"]`);
+                    if (tab) {
+                        document.querySelectorAll('.cat-tab').forEach(t => t.classList.remove('active'));
+                        tab.classList.add('active');
+                        
+                        // Centering active tab inside scroller
+                        const scroller = document.querySelector('.category-scroller');
+                        const scrollerWidth = scroller.offsetWidth;
+                        const tabLeft = tab.offsetLeft;
+                        const tabWidth = tab.offsetWidth;
+                        scroller.scrollLeft = tabLeft - (scrollerWidth / 2) + (tabWidth / 2);
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
