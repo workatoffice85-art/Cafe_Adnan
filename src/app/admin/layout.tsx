@@ -26,6 +26,14 @@ export default function AdminLayout({
       }
 
       try {
+        // 1. Check custom local fallback session FIRST (instant, synchronous, and crash-proof)
+        const customSession = localStorage.getItem('cafe-adnan-custom-session');
+        if (customSession === 'true') {
+          setAuthLoading(false);
+          return;
+        }
+
+        // 2. Otherwise try checking standard Supabase auth
         const supabase = createClient();
         const { data: { user } } = await supabase.auth.getUser();
         
@@ -34,17 +42,16 @@ export default function AdminLayout({
           return;
         }
 
-        // Check custom local fallback session (for legacy Safari/ITP bypass)
-        const customSession = localStorage.getItem('cafe-adnan-custom-session');
-        if (customSession === 'true') {
-          setAuthLoading(false);
-          return;
-        }
-
         // If neither session is valid, redirect to login
         window.location.href = '/admin/login';
       } catch {
-        window.location.href = '/admin/login';
+        // Safe fallback check: If getUser() throws a fatal exception on legacy WebKit, still allow local session
+        const customSession = localStorage.getItem('cafe-adnan-custom-session');
+        if (customSession === 'true') {
+          setAuthLoading(false);
+        } else {
+          window.location.href = '/admin/login';
+        }
       }
     }
     checkAuth();
