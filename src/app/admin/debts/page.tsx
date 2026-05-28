@@ -277,7 +277,7 @@ export default function DebtsPage() {
                 </div>
 
                 {/* Financial Totals Row */}
-                <div className="grid grid-cols-2 gap-2 text-xs bg-brand-gray-50 dark:bg-brand-gray-850 p-2.5 rounded-xl border border-brand-gray-100/50 dark:border-brand-gray-800/50">
+                <div className="grid grid-cols-2 gap-2 text-xs bg-brand-gray-50 dark:bg-brand-gray-800 p-2.5 rounded-xl border border-brand-gray-100/50 dark:border-brand-gray-800/50">
                   <div>
                     <span className="text-brand-gray-400">إجمالي المشتريات:</span>
                     <p className="font-bold text-brand-black dark:text-brand-white mt-0.5">EGP {c.total_amount.toFixed(2)}</p>

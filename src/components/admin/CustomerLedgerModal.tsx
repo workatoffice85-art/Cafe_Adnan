@@ -78,7 +78,7 @@ export function CustomerLedgerModal({
         <div className="flex-1 overflow-y-auto p-4 space-y-6">
           {/* Quick Aggregate Stats for Customer */}
           <div className="grid grid-cols-3 gap-2.5">
-            <div className="bg-brand-gray-50 dark:bg-brand-gray-850 p-3 rounded-xl border border-brand-gray-100 dark:border-brand-gray-800 flex flex-col items-center text-center">
+            <div className="bg-brand-gray-50 dark:bg-brand-gray-800 p-3 rounded-xl border border-brand-gray-100 dark:border-brand-gray-800 flex flex-col items-center text-center">
               <Wallet size={16} className="text-brand-gray-400 mb-1" />
               <span className="text-[10px] text-brand-gray-500">إجمالي المشتريات</span>
               <span className="text-xs font-bold text-brand-black dark:text-brand-white mt-0.5">
@@ -121,7 +121,7 @@ export function CustomerLedgerModal({
                 {transactions.map((t) => (
                   <div
                     key={t.id}
-                    className="bg-brand-white dark:bg-brand-gray-850 rounded-xl p-3 border border-brand-gray-150 dark:border-brand-gray-800 flex flex-col gap-2"
+                    className="bg-brand-white dark:bg-brand-gray-800 rounded-xl p-3 border border-brand-gray-200 dark:border-brand-gray-800 flex flex-col gap-2"
                   >
                     <div className="flex justify-between items-start">
                       <div className="flex items-center gap-1.5 text-xs text-brand-gray-400">
@@ -207,7 +207,7 @@ export function CustomerLedgerModal({
               </div>
 
               {/* Table View inside ledger (desktop/tablet) */}
-              <div className="hidden sm:block overflow-hidden bg-brand-white dark:bg-brand-gray-850 rounded-xl border border-brand-gray-150 dark:border-brand-gray-800">
+              <div className="hidden sm:block overflow-hidden bg-brand-white dark:bg-brand-gray-800 rounded-xl border border-brand-gray-200 dark:border-brand-gray-800">
                 <table className="w-full border-collapse text-right text-xs">
                   <thead>
                     <tr className="border-b border-brand-gray-100 dark:border-brand-gray-800 bg-brand-gray-50/50 dark:bg-brand-gray-900/50">

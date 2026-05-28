@@ -74,7 +74,7 @@ export function QuickPayModal({ debt, onSubmit, onClose }: QuickPayModalProps) {
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="p-4 space-y-4">
-          <div className="space-y-2 text-sm bg-brand-gray-50 dark:bg-brand-gray-850 p-3.5 rounded-xl border border-brand-gray-100 dark:border-brand-gray-800">
+          <div className="space-y-2 text-sm bg-brand-gray-50 dark:bg-brand-gray-800 p-3.5 rounded-xl border border-brand-gray-100 dark:border-brand-gray-800">
             {debt.description && (
               <div className="flex justify-between">
                 <span className="text-brand-gray-400">الطلب:</span>
@@ -89,7 +89,7 @@ export function QuickPayModal({ debt, onSubmit, onClose }: QuickPayModalProps) {
               <span className="text-brand-gray-400">المسدد سابقاً:</span>
               <span className="font-semibold text-green-500">EGP {alreadyPaid.toFixed(2)}</span>
             </div>
-            <div className="flex justify-between border-t border-brand-gray-250 dark:border-brand-gray-800 pt-2 font-bold text-brand-beige">
+            <div className="flex justify-between border-t border-brand-gray-200 dark:border-brand-gray-800 pt-2 font-bold text-brand-beige">
               <span>المتبقي الآجل:</span>
               <span>EGP {remaining.toFixed(2)}</span>
             </div>
@@ -107,7 +107,7 @@ export function QuickPayModal({ debt, onSubmit, onClose }: QuickPayModalProps) {
               max={remaining}
               step="0.5"
               dir="ltr"
-              className="w-full px-4 py-3 rounded-xl text-base bg-brand-gray-50 dark:bg-brand-gray-855 border border-brand-gray-200 dark:border-brand-gray-700 text-brand-black dark:text-brand-white focus:outline-none focus:border-brand-beige font-bold transition-colors"
+              className="w-full px-4 py-3 rounded-xl text-base bg-brand-gray-50 dark:bg-brand-gray-800 border border-brand-gray-200 dark:border-brand-gray-700 text-brand-black dark:text-brand-white focus:outline-none focus:border-brand-beige font-bold transition-colors"
             />
           </div>
 
