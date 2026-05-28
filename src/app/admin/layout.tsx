@@ -7,6 +7,17 @@ import { usePathname } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { LoadingSpinner } from '@/components/LoadingSpinner';
 
+const safeLocalStorageGet = (key: string): string | null => {
+  try {
+    if (typeof window !== 'undefined' && window.localStorage) {
+      return window.localStorage.getItem(key);
+    }
+  } catch (e) {
+    console.warn('localStorage is blocked:', e);
+  }
+  return null;
+};
+
 export default function AdminLayout({
   children,
 }: {
@@ -27,7 +38,7 @@ export default function AdminLayout({
 
       try {
         // 1. Check custom local fallback session FIRST (instant, synchronous, and crash-proof)
-        const customSession = localStorage.getItem('cafe-adnan-custom-session');
+        const customSession = safeLocalStorageGet('cafe-adnan-custom-session');
         if (customSession === 'true') {
           setAuthLoading(false);
           return;
@@ -46,7 +57,7 @@ export default function AdminLayout({
         window.location.href = '/admin/login';
       } catch {
         // Safe fallback check: If getUser() throws a fatal exception on legacy WebKit, still allow local session
-        const customSession = localStorage.getItem('cafe-adnan-custom-session');
+        const customSession = safeLocalStorageGet('cafe-adnan-custom-session');
         if (customSession === 'true') {
           setAuthLoading(false);
         } else {
