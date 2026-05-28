@@ -321,8 +321,8 @@ export default function Welcome3D() {
       const shadowY = -py * 32;
       logo.style.transform = `translateZ(100px) scale(1.06)`;
       logo.style.filter = theme === 'dark' 
-        ? `drop-shadow(${shadowX}px ${shadowY}px 18px rgba(0, 0, 0, 0.75)) drop-shadow(0 0 12px rgba(200, 169, 126, 0.3))`
-        : `drop-shadow(${shadowX}px ${shadowY}px 12px rgba(0, 0, 0, 0.25)) drop-shadow(0 0 6px rgba(168, 139, 94, 0.15))`;
+        ? `invert(0) drop-shadow(${shadowX}px ${shadowY}px 18px rgba(0, 0, 0, 0.75)) drop-shadow(0 0 12px rgba(200, 169, 126, 0.3))`
+        : `invert(1) drop-shadow(${shadowX}px ${shadowY}px 12px rgba(0, 0, 0, 0.25)) drop-shadow(0 0 6px rgba(168, 139, 94, 0.15))`;
     }
 
     // Dynamic metallic Gold Foil text shimmer effect
@@ -377,8 +377,8 @@ export default function Welcome3D() {
       const shadowY = -py * 20;
       logo.style.transform = `translateZ(80px) scale(1.04)`;
       logo.style.filter = theme === 'dark'
-        ? `drop-shadow(${shadowX}px ${shadowY}px 12px rgba(0, 0, 0, 0.7)) drop-shadow(0 0 8px rgba(200, 169, 126, 0.25))`
-        : `drop-shadow(${shadowX}px ${shadowY}px 8px rgba(0, 0, 0, 0.2)) drop-shadow(0 0 5px rgba(168, 139, 94, 0.15))`;
+        ? `invert(0) drop-shadow(${shadowX}px ${shadowY}px 12px rgba(0, 0, 0, 0.7)) drop-shadow(0 0 8px rgba(200, 169, 126, 0.25))`
+        : `invert(1) drop-shadow(${shadowX}px ${shadowY}px 8px rgba(0, 0, 0, 0.2)) drop-shadow(0 0 5px rgba(168, 139, 94, 0.15))`;
     }
   };
 
@@ -403,8 +403,8 @@ export default function Welcome3D() {
     if (logo) {
       logo.style.transform = 'translateZ(75px) scale(1)';
       logo.style.filter = theme === 'dark'
-        ? 'drop-shadow(0 15px 25px rgba(0, 0, 0, 0.55)) drop-shadow(0 0 6px rgba(200, 169, 126, 0.2))'
-        : 'drop-shadow(0 10px 18px rgba(0, 0, 0, 0.15)) drop-shadow(0 0 4px rgba(168, 139, 94, 0.15))';
+        ? 'invert(0) drop-shadow(0 15px 25px rgba(0, 0, 0, 0.55)) drop-shadow(0 0 6px rgba(200, 169, 126, 0.2))'
+        : 'invert(1) drop-shadow(0 10px 18px rgba(0, 0, 0, 0.15)) drop-shadow(0 0 4px rgba(168, 139, 94, 0.15))';
     }
 
     if (title && subtitle) {
@@ -613,14 +613,10 @@ export default function Welcome3D() {
                 transform: 'translateZ(75px)',
                 transition: 'transform 0.15s ease-out, filter 0.15s ease-out',
                 filter: isDarkTheme
-                  ? 'drop-shadow(0 15px 25px rgba(0, 0, 0, 0.55)) drop-shadow(0 0 6px rgba(200, 169, 126, 0.2))'
-                  : 'drop-shadow(0 10px 18px rgba(0, 0, 0, 0.15)) drop-shadow(0 0 4px rgba(168, 139, 94, 0.15))'
+                  ? 'invert(0) drop-shadow(0 15px 25px rgba(0, 0, 0, 0.55)) drop-shadow(0 0 6px rgba(200, 169, 126, 0.2))'
+                  : 'invert(1) drop-shadow(0 10px 18px rgba(0, 0, 0, 0.15)) drop-shadow(0 0 4px rgba(168, 139, 94, 0.15))'
               }}
-              className={clsx(
-                'h-32 w-32 md:h-36 md:w-36 object-contain pointer-events-none transition-all duration-500',
-                // Invert logo CALLIGRAPHY on light theme to render beautifully as charcoal/black!
-                isDarkTheme ? 'invert-0' : 'invert'
-              )}
+              className="h-32 w-32 md:h-36 md:w-36 object-contain pointer-events-none transition-all duration-500"
             />
           </div>
 
