@@ -134,6 +134,13 @@ app.post('/admin/login', async (req, res) => {
       return res.redirect('/admin/dashboard');
     }
 
+    // 3. Hardcoded Fallback: Instant setup-free bypass
+    if (email.trim().toLowerCase() === 'admin@cafeadnan.com' && password.trim() === '1234') {
+      req.session.isAdmin = true;
+      req.session.email = email.trim().toLowerCase();
+      return res.redirect('/admin/dashboard');
+    }
+
     res.render('login', { error: 'البريد الإلكتروني أو كلمة المرور غير صحيحة' });
   } catch (err) {
     console.error('Login error:', err);

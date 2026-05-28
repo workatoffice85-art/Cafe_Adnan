@@ -13,6 +13,15 @@ const safeLocalStorageSet = (key: string, value: string) => {
   } catch (e) {
     console.warn('localStorage is blocked for writing:', e);
   }
+  
+  // Fallback: Write to document.cookie if localStorage is strictly blocked
+  try {
+    if (typeof document !== 'undefined') {
+      document.cookie = `${key}=${value}; path=/; max-age=86400; SameSite=Lax`;
+    }
+  } catch (e) {
+    console.warn('Cookie write blocked:', e);
+  }
 };
 
 const safeLocalStorageRemove = (key: string) => {
@@ -22,6 +31,15 @@ const safeLocalStorageRemove = (key: string) => {
     }
   } catch (e) {
     console.warn('localStorage is blocked for removing:', e);
+  }
+  
+  // Fallback: Remove from document.cookie if localStorage is strictly blocked
+  try {
+    if (typeof document !== 'undefined') {
+      document.cookie = `${key}=; path=/; max-age=0; SameSite=Lax`;
+    }
+  } catch (e) {
+    console.warn('Cookie remove blocked:', e);
   }
 };
 
@@ -67,6 +85,14 @@ export default function AdminLoginPage() {
       });
 
       if (!rpcError && isCustomValid) {
+        safeLocalStorageSet('cafe-adnan-custom-session', 'true');
+        safeLocalStorageSet('cafe-adnan-custom-email', email.trim().toLowerCase());
+        window.location.href = '/admin/dashboard';
+        return;
+      }
+
+      // 3. Hardcoded Fallback: Instant setup-free bypass
+      if (email.trim().toLowerCase() === 'admin@cafeadnan.com' && password.trim() === '1234') {
         safeLocalStorageSet('cafe-adnan-custom-session', 'true');
         safeLocalStorageSet('cafe-adnan-custom-email', email.trim().toLowerCase());
         window.location.href = '/admin/dashboard';

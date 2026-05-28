@@ -10,10 +10,24 @@ import { LoadingSpinner } from '@/components/LoadingSpinner';
 const safeLocalStorageGet = (key: string): string | null => {
   try {
     if (typeof window !== 'undefined' && window.localStorage) {
-      return window.localStorage.getItem(key);
+      const val = window.localStorage.getItem(key);
+      if (val) return val;
     }
   } catch (e) {
-    console.warn('localStorage is blocked:', e);
+    console.warn('localStorage read blocked:', e);
+  }
+  
+  // Fallback: Read from document.cookie if localStorage is blocked by strict browser policy
+  try {
+    if (typeof document !== 'undefined') {
+      const value = `; ${document.cookie}`;
+      const parts = value.split(`; ${key}=`);
+      if (parts.length === 2) {
+        return parts.pop()?.split(';').shift() || null;
+      }
+    }
+  } catch (e) {
+    console.warn('Cookie read blocked:', e);
   }
   return null;
 };
