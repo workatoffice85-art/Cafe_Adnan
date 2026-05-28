@@ -20,12 +20,13 @@ export default function Welcome3D() {
   const subtitleRef = useRef<HTMLHeadingElement>(null);
   
   const [mounted, setMounted] = useState(false);
+  const [isLite, setIsLite] = useState(false);
   const [isExiting, setIsExiting] = useState(false);
   const [countdown, setCountdown] = useState(100); 
   const [isHovering, setIsHovering] = useState(false);
   const [showSkipPrompt, setShowSkipPrompt] = useState(false);
 
-  const COUNTDOWN_DURATION = 7000; // 7 seconds
+  const COUNTDOWN_DURATION = isLite ? 2500 : 7000;
 
   // Refs to track states inside high-frequency render loops (prevents stale closure lag!)
   const isExitingRef = useRef(false);
@@ -55,13 +56,34 @@ export default function Welcome3D() {
   }, [theme]);
 
   useEffect(() => {
+    const checkIsLegacy = () => {
+      if (typeof window === 'undefined') return false;
+      const ua = window.navigator.userAgent;
+      
+      const isLegacyIOS = /iPhone OS (?:[0-9]|1[0-5])_/i.test(ua) || /iPad.*OS (?:[0-9]|1[0-5])_/i.test(ua);
+      const isLegacySafari = /Version\/(?:[0-9]|1[0-5])\.[0-9]+(\.[0-9]+)*.*Safari/i.test(ua);
+      
+      let isMediaLegacy = false;
+      try {
+        const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+        isMediaLegacy = typeof mediaQuery.addEventListener !== 'function';
+      } catch (e) {
+        isMediaLegacy = true;
+      }
+      
+      return isLegacyIOS || isLegacySafari || isMediaLegacy;
+    };
+
+    const isLegacy = checkIsLegacy();
+    setIsLite(isLegacy);
+
     const timer = setTimeout(() => {
       setMounted(true);
     }, 0);
     // Prefetch the menu page immediately on mount so navigation is instant
     router.prefetch('/menu');
-    // Show skip prompt after 2 seconds
-    const promptTimer = setTimeout(() => setShowSkipPrompt(true), 2500);
+    // Show skip prompt after 0.8 seconds in lite mode or 2.5 seconds in normal mode
+    const promptTimer = setTimeout(() => setShowSkipPrompt(true), isLegacy ? 800 : 2500);
     return () => {
       clearTimeout(timer);
       clearTimeout(promptTimer);
@@ -90,7 +112,7 @@ export default function Welcome3D() {
 
   // Canvas particle system (Warm Golden Steam & Stardust - Supports Light & Dark Gradients)
   useEffect(() => {
-    if (!mounted) return;
+    if (!mounted || isLite) return;
 
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -306,7 +328,7 @@ export default function Welcome3D() {
 
   // Masterpiece 3D Tilt, Dynamic Shadows and Reflection calculations
   const handleMouseMove3D = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (isExitingRef.current) return;
+    if (isExitingRef.current || isLite) return;
     
     const card = cardRef.current;
     const container = containerRef.current;
@@ -353,7 +375,7 @@ export default function Welcome3D() {
   };
 
   const handleTouchMove3D = (e: React.TouchEvent<HTMLDivElement>) => {
-    if (isExitingRef.current) return;
+    if (isExitingRef.current || isLite) return;
     
     const card = cardRef.current;
     const container = containerRef.current;
@@ -396,7 +418,7 @@ export default function Welcome3D() {
   };
 
   const handleMouseLeave3D = () => {
-    if (isExitingRef.current) return;
+    if (isExitingRef.current || isLite) return;
     
     const card = cardRef.current;
     const sheen = sheenRef.current;
@@ -445,14 +467,16 @@ export default function Welcome3D() {
       )}
     >
       {/* Background Canvas Particles */}
-      <canvas 
-        ref={canvasRef} 
-        className="absolute inset-0 w-full h-full z-0 block pointer-events-none transition-opacity duration-300"
-        style={{ opacity: isExiting ? 0 : 1 }}
-      />
+      {!isLite && (
+        <canvas 
+          ref={canvasRef} 
+          className="absolute inset-0 w-full h-full z-0 block pointer-events-none transition-opacity duration-300"
+          style={{ opacity: isExiting ? 0 : 1 }}
+        />
+      )}
 
       {/* Floating 3D Sparkles in space */}
-      {!isExiting && (
+      {!isExiting && !isLite && (
         <>
           <div 
             className={clsx(
@@ -533,32 +557,35 @@ export default function Welcome3D() {
         <div
           ref={cardRef}
           onClick={handleEnterMenu}
-          style={{ transformStyle: 'preserve-3d', transition: isHovering && !isExiting ? 'none' : 'transform 0.8s cubic-bezier(0.15, 0.85, 0.15, 1)' }}
+          style={isLite ? { transition: 'transform 0.3s ease, opacity 0.3s ease' } : { transformStyle: 'preserve-3d', transition: isHovering && !isExiting ? 'none' : 'transform 0.8s cubic-bezier(0.15, 0.85, 0.15, 1)' }}
           className={clsx(
             'relative w-full h-full rounded-[36px] z-10 overflow-hidden flex flex-col items-center justify-between p-8 md:p-9 text-center transition-all duration-500 border-2',
             isDarkTheme 
               ? 'bg-black/75 border-brand-beige/35 shadow-[0_25px_60px_rgba(0,0,0,0.85),_inset_0_2px_4px_rgba(255,255,255,0.15)]' 
               : 'bg-white/75 border-brand-beige/45 shadow-[0_25px_50px_rgba(168,139,94,0.1),_inset_0_2px_4px_rgba(255,255,255,0.7)]',
-            isHovering && !isExiting 
+            !isLite && isHovering && !isExiting 
               ? (isDarkTheme ? 'shadow-[0_30px_70px_rgba(200,169,126,0.22),_0_0_40px_rgba(200,169,126,0.1)]' : 'shadow-[0_30px_60px_rgba(168,139,94,0.16),_0_0_30px_rgba(200,169,126,0.06)]')
-              : ''
+              : '',
+            isLite ? 'hover:scale-[1.02] active:scale-98' : ''
           )}
         >
           {/* Real Light Sheen Reflection Layer */}
-          <div
-            ref={sheenRef}
-            className="absolute inset-0 pointer-events-none z-30 transition-opacity duration-300 opacity-0"
-          />
+          {!isLite && (
+            <div
+              ref={sheenRef}
+              className="absolute inset-0 pointer-events-none z-30 transition-opacity duration-300 opacity-0"
+            />
+          )}
 
           {/* Double Beveled Glass Corners */}
-          <div style={{ transform: 'translateZ(20px)' }} className={clsx('absolute top-5 left-5 w-5 h-5 border-t-[3px] border-l-[3px] rounded-tl-md', isDarkTheme ? 'border-brand-gold/60' : 'border-brand-beige-dark/60')} />
-          <div style={{ transform: 'translateZ(20px)' }} className={clsx('absolute top-5 right-5 w-5 h-5 border-t-[3px] border-r-[3px] rounded-tr-md', isDarkTheme ? 'border-brand-gold/60' : 'border-brand-beige-dark/60')} />
-          <div style={{ transform: 'translateZ(20px)' }} className={clsx('absolute bottom-5 left-5 w-5 h-5 border-b-[3px] border-l-[3px] rounded-bl-md', isDarkTheme ? 'border-brand-gold/60' : 'border-brand-beige-dark/60')} />
-          <div style={{ transform: 'translateZ(20px)' }} className={clsx('absolute bottom-5 right-5 w-5 h-5 border-b-[3px] border-r-[3px] rounded-br-md', isDarkTheme ? 'border-brand-gold/60' : 'border-brand-beige-dark/60')} />
+          <div style={isLite ? {} : { transform: 'translateZ(20px)' }} className={clsx('absolute top-5 left-5 w-5 h-5 border-t-[3px] border-l-[3px] rounded-tl-md', isDarkTheme ? 'border-brand-gold/60' : 'border-brand-beige-dark/60')} />
+          <div style={isLite ? {} : { transform: 'translateZ(20px)' }} className={clsx('absolute top-5 right-5 w-5 h-5 border-t-[3px] border-r-[3px] rounded-tr-md', isDarkTheme ? 'border-brand-gold/60' : 'border-brand-beige-dark/60')} />
+          <div style={isLite ? {} : { transform: 'translateZ(20px)' }} className={clsx('absolute bottom-5 left-5 w-5 h-5 border-b-[3px] border-l-[3px] rounded-bl-md', isDarkTheme ? 'border-brand-gold/60' : 'border-brand-beige-dark/60')} />
+          <div style={isLite ? {} : { transform: 'translateZ(20px)' }} className={clsx('absolute bottom-5 right-5 w-5 h-5 border-b-[3px] border-r-[3px] rounded-br-md', isDarkTheme ? 'border-brand-gold/60' : 'border-brand-beige-dark/60')} />
 
           {/* Est badge inside card */}
           <span
-            style={{ transform: 'translateZ(35px)' }}
+            style={isLite ? {} : { transform: 'translateZ(35px)' }}
             className={clsx(
               'text-[10px] tracking-[0.3em] uppercase font-bold font-inter flex items-center gap-1.5 transition-colors duration-500',
               isDarkTheme ? 'text-brand-beige-light opacity-80' : 'text-brand-beige-dark'
@@ -569,11 +596,11 @@ export default function Welcome3D() {
 
           {/* 3D ORBITAL SYSTEM */}
           <div
-            style={{ transform: 'translateZ(80px)', transformStyle: 'preserve-3d' }}
+            style={isLite ? {} : { transform: 'translateZ(80px)', transformStyle: 'preserve-3d' }}
             className="relative w-44 h-44 md:w-52 md:h-52 flex items-center justify-center my-4 group z-20"
           >
             {/* Holographic orbital rings */}
-            {!isExiting && (
+            {!isExiting && !isLite && (
               <>
                 <div 
                   style={{ 
@@ -599,13 +626,21 @@ export default function Welcome3D() {
                 )} />
               </>
             )}
+            {!isExiting && isLite && (
+              <div className={clsx(
+                'absolute inset-2 rounded-full border border-dashed pointer-events-none animate-[spin_40s_linear_infinite]',
+                isDarkTheme ? 'border-brand-gold/30' : 'border-brand-beige-dark/30'
+              )} />
+            )}
 
             {/* Absolute Floating Logo Image */}
             <img
               ref={logoRef}
               src="/logo.png"
               alt="Cafe Adnan Logo"
-              style={{ 
+              style={isLite ? {
+                filter: isDarkTheme ? 'invert(0)' : 'invert(1)'
+              } : { 
                 transform: 'translateZ(75px)',
                 transition: 'transform 0.15s ease-out, filter 0.15s ease-out',
                 filter: isDarkTheme
@@ -618,12 +653,15 @@ export default function Welcome3D() {
 
           {/* 3D Typographic Section */}
           <div 
-            style={{ transform: 'translateZ(50px)', transformStyle: 'preserve-3d' }} 
+            style={isLite ? {} : { transform: 'translateZ(50px)', transformStyle: 'preserve-3d' }} 
             className="flex flex-col items-center gap-2.5 w-full z-10"
           >
             <h1 
               ref={titleRef}
-              style={{ 
+              style={isLite ? {
+                color: isDarkTheme ? '#E8D5B7' : '#6b4a28',
+                textShadow: 'none'
+              } : { 
                 backgroundImage: isDarkTheme 
                   ? 'linear-gradient(135deg, #B8860B 0%, #E8D5B7 50%, #C8A97E 100%)' 
                   : 'linear-gradient(135deg, #6b4a28 0%, #A88B5E 50%, #6b4a28 100%)',
@@ -639,7 +677,10 @@ export default function Welcome3D() {
             </h1>
             <h2 
               ref={subtitleRef}
-              style={{ 
+              style={isLite ? {
+                color: isDarkTheme ? '#E8D5B7' : '#a88b5e',
+                textShadow: 'none'
+              } : { 
                 backgroundImage: isDarkTheme 
                   ? 'linear-gradient(135deg, #A88B5E 0%, #E8D5B7 50%, #A88B5E 100%)'
                   : 'linear-gradient(135deg, #a88b5e 0%, #6b4a28 50%, #a88b5e 100%)',
@@ -654,7 +695,7 @@ export default function Welcome3D() {
               Cafe Adnan
             </h2>
             <div 
-              style={{ transform: 'translateZ(20px)' }} 
+              style={isLite ? {} : { transform: 'translateZ(20px)' }} 
               className={clsx(
                 'w-16 h-[2px] my-1.5 transition-all duration-500',
                 isDarkTheme 
@@ -679,7 +720,7 @@ export default function Welcome3D() {
 
           {/* Interactive Luxury Neon Enter Button */}
           <div
-            style={{ transform: 'translateZ(65px)' }}
+            style={isLite ? {} : { transform: 'translateZ(65px)' }}
             className="w-full flex flex-col items-center gap-4 mt-5 z-20"
           >
             <button
@@ -696,7 +737,9 @@ export default function Welcome3D() {
               )}
             >
               {/* Lightning speed sheen streak */}
-              <div className="absolute inset-0 w-1/3 h-full bg-gradient-to-r from-transparent via-white/30 to-transparent -skew-x-12 translate-x-[-150%] group-hover:translate-x-[250%] transition-transform duration-1000 ease-out" />
+              {!isLite && (
+                <div className="absolute inset-0 w-1/3 h-full bg-gradient-to-r from-transparent via-white/30 to-transparent -skew-x-12 translate-x-[-150%] group-hover:translate-x-[250%] transition-transform duration-1000 ease-out" />
+              )}
               
               <span className="text-sm md:text-base tracking-wider">دخول القائمة | Explore Menu</span>
               <ArrowRight className="h-4 w-4 md:h-5 md:w-5 transition-transform duration-300 group-hover:translate-x-1.5 rtl:rotate-180" />

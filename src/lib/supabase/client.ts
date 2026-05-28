@@ -13,5 +13,13 @@ export function createClient() {
     );
   }
 
-  return createBrowserClient(supabaseUrl, supabaseAnonKey);
+  return createBrowserClient(supabaseUrl, supabaseAnonKey, {
+    auth: {
+      persistSession: true,
+      autoRefreshToken: true,
+      detectSessionInUrl: true,
+      storageKey: 'cafe-adnan-session',
+      storage: typeof window !== 'undefined' ? window.localStorage : undefined,
+    },
+  });
 }
