@@ -1,5 +1,5 @@
-import { redirect } from 'next/navigation';
+import Welcome3D from '@/components/Welcome3D';
 
 export default function Home() {
-  redirect('/menu');
+  return <Welcome3D />;
 }
