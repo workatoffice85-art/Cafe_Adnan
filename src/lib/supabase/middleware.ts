@@ -38,15 +38,7 @@ export async function updateSession(request: NextRequest) {
   } = await supabase.auth.getUser();
 
   // Protect admin routes (except login)
-  if (
-    !user &&
-    request.nextUrl.pathname.startsWith('/admin') &&
-    !request.nextUrl.pathname.startsWith('/admin/login')
-  ) {
-    const url = request.nextUrl.clone();
-    url.pathname = '/admin/login';
-    return NextResponse.redirect(url);
-  }
+  // Client-side layout.tsx will handle the redirect if cookies are blocked by Safari ITP.
 
   // Redirect logged-in users away from login page
   if (user && request.nextUrl.pathname === '/admin/login') {

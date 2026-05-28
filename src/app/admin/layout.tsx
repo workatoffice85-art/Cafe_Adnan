@@ -1,9 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Menu } from 'lucide-react';
 import { AdminSidebar } from '@/components/admin/AdminSidebar';
 import { usePathname } from 'next/navigation';
+import { createClient } from '@/lib/supabase/client';
+import { LoadingSpinner } from '@/components/LoadingSpinner';
 
 export default function AdminLayout({
   children,
@@ -11,9 +13,40 @@ export default function AdminLayout({
   children: React.ReactNode;
 }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [authLoading, setAuthLoading] = useState(true);
   const pathname = usePathname();
 
   const isLoginPage = pathname === '/admin/login';
+
+  useEffect(() => {
+    async function checkAuth() {
+      if (isLoginPage) {
+        setAuthLoading(false);
+        return;
+      }
+
+      try {
+        const supabase = createClient();
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) {
+          window.location.href = '/admin/login';
+        } else {
+          setAuthLoading(false);
+        }
+      } catch {
+        window.location.href = '/admin/login';
+      }
+    }
+    checkAuth();
+  }, [isLoginPage]);
+
+  if (authLoading && !isLoginPage) {
+    return (
+      <div className="min-h-screen bg-brand-white dark:bg-brand-black flex items-center justify-center">
+        <LoadingSpinner size="lg" />
+      </div>
+    );
+  }
 
   if (isLoginPage) {
     return <>{children}</>;

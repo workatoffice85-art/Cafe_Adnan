@@ -274,10 +274,11 @@ export default function Welcome3D() {
         }
 
         // Draw particle with glowing aura
+        const alpha = Math.max(0, p.alpha);
         ctx.beginPath();
         const pGlow = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.size * 2.5);
-        pGlow.addColorStop(0, p.color + p.alpha + ')');
-        pGlow.addColorStop(0.3, p.color + p.alpha * 0.5 + ')');
+        pGlow.addColorStop(0, p.color + alpha + ')');
+        pGlow.addColorStop(0.3, p.color + alpha * 0.5 + ')');
         pGlow.addColorStop(1, p.color + '0)');
         ctx.fillStyle = pGlow;
         ctx.arc(p.x, p.y, p.size * 3.5, 0, Math.PI * 2);
@@ -348,18 +349,7 @@ export default function Welcome3D() {
         : `invert(1) drop-shadow(${shadowX}px ${shadowY}px 12px rgba(0, 0, 0, 0.25)) drop-shadow(0 0 6px rgba(168, 139, 94, 0.15))`;
     }
 
-    // Dynamic metallic Gold Foil text shimmer effect
-    if (title && subtitle) {
-      const textAngle = ((px + 0.5) * 360).toFixed(0);
-      if (theme === 'dark') {
-        title.style.backgroundImage = `linear-gradient(${textAngle}deg, #A88B5E 0%, #F5E5C9 30%, #C8A97E 60%, #B8860B 100%)`;
-        subtitle.style.backgroundImage = `linear-gradient(${textAngle}deg, #A88B5E 0%, #F5E5C9 30%, #C8A97E 60%, #B8860B 100%)`;
-      } else {
-        // Deep copper-gold sheen for high contrast in light mode
-        title.style.backgroundImage = `linear-gradient(${textAngle}deg, #6b4a28 0%, #C8A97E 35%, #A88B5E 65%, #6b4a28 100%)`;
-        subtitle.style.backgroundImage = `linear-gradient(${textAngle}deg, #6b4a28 0%, #C8A97E 35%, #A88B5E 65%, #6b4a28 100%)`;
-      }
-    }
+
   };
 
   const handleTouchMove3D = (e: React.TouchEvent<HTMLDivElement>) => {
