@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { Moon, Sun, ArrowRight, Sparkles, Coffee } from 'lucide-react';
 import { useTheme } from '@/providers/ThemeProvider';
