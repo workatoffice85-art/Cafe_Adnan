@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { Moon, Sun, ArrowRight, Sparkles, Coffee } from 'lucide-react';
 import { useTheme } from '@/providers/ThemeProvider';
 import clsx from 'clsx';
@@ -453,9 +454,6 @@ export default function Welcome3D() {
     }
   };
 
-
-  if (!mounted) return null;
-
   const isDarkTheme = theme === 'dark';
 
   return (
@@ -723,10 +721,13 @@ export default function Welcome3D() {
             style={isLite ? {} : { transform: 'translateZ(65px)' }}
             className="w-full flex flex-col items-center gap-4 mt-5 z-20"
           >
-            <button
+            <Link
+              href="/menu"
               onClick={(e) => {
-                e.stopPropagation();
-                handleEnterMenu();
+                if (!isLite) {
+                  e.preventDefault();
+                  handleEnterMenu();
+                }
               }}
               className={clsx(
                 'relative w-full py-4.5 px-6 rounded-2xl flex items-center justify-center gap-3 overflow-hidden transition-all duration-300 font-bold group shadow-lg cursor-pointer',
@@ -743,7 +744,7 @@ export default function Welcome3D() {
               
               <span className="text-sm md:text-base tracking-wider">دخول القائمة | Explore Menu</span>
               <ArrowRight className="h-4 w-4 md:h-5 md:w-5 transition-transform duration-300 group-hover:translate-x-1.5 rtl:rotate-180" />
-            </button>
+            </Link>
           </div>
         </div>
       </div>
