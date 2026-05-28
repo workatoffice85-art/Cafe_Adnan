@@ -1,4 +1,4 @@
-import { createBrowserClient } from '@supabase/ssr';
+import { createClient as createSupabaseClient } from '@supabase/supabase-js';
 
 const safeLocalStorage = {
   getItem: (key: string): string | null => {
@@ -37,14 +37,13 @@ export function createClient() {
 
   if (!supabaseUrl || !supabaseAnonKey) {
     // Return a mock client during build time to prevent prerendering errors
-    // In production, these env vars must be set
-    return createBrowserClient(
+    return createSupabaseClient(
       'https://placeholder.supabase.co',
       'placeholder-key'
     );
   }
 
-  return createBrowserClient(supabaseUrl, supabaseAnonKey, {
+  return createSupabaseClient(supabaseUrl, supabaseAnonKey, {
     auth: {
       persistSession: true,
       autoRefreshToken: true,

@@ -5,6 +5,26 @@ import { Logo } from '@/components/Logo';
 import { createClient } from '@/lib/supabase/client';
 import { LoadingSpinner } from '@/components/LoadingSpinner';
 
+const safeLocalStorageSet = (key: string, value: string) => {
+  try {
+    if (typeof window !== 'undefined' && window.localStorage) {
+      window.localStorage.setItem(key, value);
+    }
+  } catch (e) {
+    console.warn('localStorage is blocked for writing:', e);
+  }
+};
+
+const safeLocalStorageRemove = (key: string) => {
+  try {
+    if (typeof window !== 'undefined' && window.localStorage) {
+      window.localStorage.removeItem(key);
+    }
+  } catch (e) {
+    console.warn('localStorage is blocked for removing:', e);
+  }
+};
+
 export default function AdminLoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -20,13 +40,21 @@ export default function AdminLoginPage() {
       const supabase = createClient();
       
       // 1. Try standard Supabase Auth first
-      const { error: authError } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
+      // Wrap it in a sub-try-catch to prevent fatal WebKit crashes on old iOS Safari
+      let authError = null;
+      try {
+        const { error } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
+        authError = error;
+      } catch (err) {
+        console.warn('Standard Supabase auth crashed, falling back to RPC:', err);
+        authError = err || new Error('Auth crashed');
+      }
 
       if (!authError) {
-        localStorage.removeItem('cafe-adnan-custom-session');
+        safeLocalStorageRemove('cafe-adnan-custom-session');
         window.location.href = '/admin/dashboard';
         return;
       }
@@ -39,8 +67,8 @@ export default function AdminLoginPage() {
       });
 
       if (!rpcError && isCustomValid) {
-        localStorage.setItem('cafe-adnan-custom-session', 'true');
-        localStorage.setItem('cafe-adnan-custom-email', email.trim().toLowerCase());
+        safeLocalStorageSet('cafe-adnan-custom-session', 'true');
+        safeLocalStorageSet('cafe-adnan-custom-email', email.trim().toLowerCase());
         window.location.href = '/admin/dashboard';
         return;
       }
