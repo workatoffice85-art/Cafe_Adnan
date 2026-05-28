@@ -29,9 +29,12 @@ export default function Welcome3D() {
 
   useEffect(() => {
     setMounted(true);
+    // Prefetch the menu page immediately on mount so navigation is instant
+    router.prefetch('/menu');
+    // Show skip prompt after 2 seconds
     const promptTimer = setTimeout(() => setShowSkipPrompt(true), 2500);
     return () => clearTimeout(promptTimer);
-  }, []);
+  }, [router]);
 
   // Countdown timer for automatic redirect
   useEffect(() => {
