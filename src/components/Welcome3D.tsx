@@ -2,30 +2,33 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Moon, Sun, ArrowRight, Sparkles } from 'lucide-react';
+import { Moon, Sun, ArrowRight, Sparkles, Coffee } from 'lucide-react';
 import { useTheme } from '@/providers/ThemeProvider';
 import clsx from 'clsx';
 
 export default function Welcome3D() {
   const router = useRouter();
   const { theme, toggleTheme } = useTheme();
+  
+  // Refs for 60fps direct DOM manipulation
   const cardRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const sheenRef = useRef<HTMLDivElement>(null);
-
+  const logoRef = useRef<HTMLImageElement>(null);
+  const titleRef = useRef<HTMLHeadingElement>(null);
+  const subtitleRef = useRef<HTMLHeadingElement>(null);
+  
   const [mounted, setMounted] = useState(false);
   const [isExiting, setIsExiting] = useState(false);
-  const [countdown, setCountdown] = useState(100); // Progress percentage (starts at 100, drops to 0)
+  const [countdown, setCountdown] = useState(100); 
   const [isHovering, setIsHovering] = useState(false);
   const [showSkipPrompt, setShowSkipPrompt] = useState(false);
 
-  // Constants
-  const COUNTDOWN_DURATION = 6000; // 6 seconds auto-redirect
+  const COUNTDOWN_DURATION = 7000; // 7 seconds to let them enjoy the 3D masterpiece
 
   useEffect(() => {
     setMounted(true);
-    // Show skip prompt after 2 seconds
     const promptTimer = setTimeout(() => setShowSkipPrompt(true), 2500);
     return () => clearTimeout(promptTimer);
   }, []);
@@ -50,7 +53,7 @@ export default function Welcome3D() {
     return () => clearInterval(interval);
   }, [mounted, isExiting]);
 
-  // Canvas particle system (Warm Golden Sparks)
+  // Canvas particle system (Warm Golden Steam & Stardust)
   useEffect(() => {
     if (!mounted) return;
 
@@ -64,7 +67,7 @@ export default function Welcome3D() {
     let width = (canvas.width = window.innerWidth);
     let height = (canvas.height = window.innerHeight);
 
-    // Mouse positions for interactive physics
+    // Mouse coordinates for interactive physics
     const mouse = { x: -1000, y: -1000, active: false };
 
     const handleResize = () => {
@@ -77,8 +80,8 @@ export default function Welcome3D() {
       mouse.y = e.clientY;
       mouse.active = true;
       
-      // Spawn interaction particles
-      if (Math.random() < 0.3) {
+      // Spawn interaction micro-sparks
+      if (Math.random() < 0.4) {
         spawnParticle(e.clientX, e.clientY, true);
       }
     };
@@ -108,120 +111,130 @@ export default function Welcome3D() {
       vx: number;
       vy: number;
       size: number;
-      maxSize: number;
       alpha: number;
       color: string;
-      speed: number;
-      growth: number;
       interactive: boolean;
+      orbitOffset: number;
+      orbitSpeed: number;
     }
 
     const particles: Particle[] = [];
-    const maxParticles = 60;
+    const maxParticles = 80;
 
-    const goldColors = [
+    const luxuryGoldColors = [
       'rgba(200, 169, 126, ', // brand-beige
       'rgba(232, 213, 183, ', // brand-beige-light
       'rgba(184, 134, 11, ',  // brand-gold
-      'rgba(255, 223, 137, ', // warm pale gold
+      'rgba(243, 203, 116, ', // glowing golden light
+      'rgba(255, 235, 190, ', // star light
     ];
 
     const spawnParticle = (x: number, y: number, interactive = false) => {
-      const size = Math.random() * 1.5 + 0.5;
-      const colorIndex = Math.floor(Math.random() * goldColors.length);
+      const size = Math.random() * 2 + 0.6;
+      const colorIndex = Math.floor(Math.random() * luxuryGoldColors.length);
       
       particles.push({
         x,
         y,
-        vx: (Math.random() - 0.5) * 1.2,
-        vy: interactive ? (Math.random() - 0.5) * 2 : -Math.random() * 1.5 - 0.5,
+        vx: (Math.random() - 0.5) * 1.5,
+        vy: interactive ? (Math.random() - 0.5) * 2.5 : -Math.random() * 1.2 - 0.4,
         size,
-        maxSize: Math.random() * 3 + 2,
-        alpha: Math.random() * 0.5 + 0.3,
-        color: goldColors[colorIndex],
-        speed: Math.random() * 0.02 + 0.005,
-        growth: Math.random() * 0.05,
-        interactive
+        alpha: Math.random() * 0.6 + 0.3,
+        color: luxuryGoldColors[colorIndex],
+        interactive,
+        orbitOffset: Math.random() * Math.PI * 2,
+        orbitSpeed: (Math.random() - 0.5) * 0.03
       });
     };
 
-    // Initialize initial particles
+    // Spawn initial particles
     for (let i = 0; i < maxParticles; i++) {
       spawnParticle(Math.random() * width, Math.random() * height);
     }
 
     const render = () => {
-      ctx.clearRect(0, 0, width, height);
-
-      // Create a luxurious background radial glow based on the theme
+      // Luxurious Deep Pitch-Black Coffee Gradient background (always dark for premium contrast)
       const isDark = document.documentElement.classList.contains('dark');
+      
+      // Let's create an immersive warm dark theme by default, providing high-end gold contrast
       const glowGrad = ctx.createRadialGradient(
         width / 2, height / 2, 0,
         width / 2, height / 2, Math.max(width, height)
       );
+      
       if (isDark) {
-        glowGrad.addColorStop(0, '#121212');
-        glowGrad.addColorStop(0.5, '#0a0a0a');
-        glowGrad.addColorStop(1, '#020202');
+        glowGrad.addColorStop(0, '#100a08'); // Deep chocolate-coffee core
+        glowGrad.addColorStop(0.5, '#070403');
+        glowGrad.addColorStop(1, '#020101');
       } else {
-        glowGrad.addColorStop(0, '#fefdfb');
-        glowGrad.addColorStop(0.5, '#FAF6F0');
-        glowGrad.addColorStop(1, '#f0e9dd');
+        // High contrast luxury dark theme even on light mode, but with warmer accents
+        glowGrad.addColorStop(0, '#18120e'); 
+        glowGrad.addColorStop(0.6, '#0d0806');
+        glowGrad.addColorStop(1, '#050302');
       }
+      
       ctx.fillStyle = glowGrad;
       ctx.fillRect(0, 0, width, height);
 
-      // Spawn environmental particles from the bottom
-      if (particles.length < maxParticles && Math.random() < 0.1) {
+      // Ambient luxury background beam (glowing gold columns)
+      ctx.fillStyle = 'rgba(200, 169, 126, 0.015)';
+      ctx.beginPath();
+      ctx.ellipse(width / 2, height / 2, width * 0.3, height * 0.8, Math.PI / 6, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Spawn new rising particles
+      if (particles.length < maxParticles && Math.random() < 0.15) {
         spawnParticle(Math.random() * width, height + 10);
       }
 
       for (let i = particles.length - 1; i >= 0; i--) {
         const p = particles[i];
 
-        // Particle dynamics
+        // Particle movement
         p.x += p.vx;
         p.y += p.vy;
 
-        // Interactive physics with cursor
+        // Apply slight orbital drift for magical stardust look
+        p.orbitOffset += p.orbitSpeed;
+        p.x += Math.sin(p.orbitOffset) * 0.15;
+
+        // Interactive gravity repel from cursor
         if (mouse.active) {
           const dx = p.x - mouse.x;
           const dy = p.y - mouse.y;
           const dist = Math.sqrt(dx * dx + dy * dy);
           
-          if (dist < 150) {
-            const force = (150 - dist) / 150;
+          if (dist < 180) {
+            const force = (180 - dist) / 180;
             const angle = Math.atan2(dy, dx);
             
-            // Push away
-            p.vx += Math.cos(angle) * force * 0.15;
-            p.vy += Math.sin(angle) * force * 0.15;
-            
-            // Brighten near cursor
-            p.alpha = Math.min(1, p.alpha + 0.05);
+            p.vx += Math.cos(angle) * force * 0.2;
+            p.vy += Math.sin(angle) * force * 0.2;
+            p.alpha = Math.min(0.9, p.alpha + 0.02);
           }
         }
 
-        // Apply friction
-        p.vx *= 0.98;
+        // Environmental drift friction
+        p.vx *= 0.97;
         if (p.interactive) {
-          p.vy *= 0.98;
-          p.alpha -= 0.008; // Interactive ones fade faster
+          p.vy *= 0.97;
+          p.alpha -= 0.007;
         } else {
-          // Environmental float upwards
-          p.vy = Math.max(-2, p.vy - 0.01);
+          p.vy = Math.max(-1.8, p.vy - 0.005);
+          p.alpha -= 0.001; // environmental particles fade extremely slowly
         }
 
-        // Draw particle
+        // Draw particle with glowing aura
         ctx.beginPath();
-        const grad = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.size * 2);
-        grad.addColorStop(0, p.color + p.alpha + ')');
-        grad.addColorStop(1, p.color + '0)');
-        ctx.fillStyle = grad;
-        ctx.arc(p.x, p.y, p.size * 2.5, 0, Math.PI * 2);
+        const pGlow = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.size * 2.5);
+        pGlow.addColorStop(0, p.color + p.alpha + ')');
+        pGlow.addColorStop(0.3, p.color + p.alpha * 0.5 + ')');
+        pGlow.addColorStop(1, p.color + '0)');
+        ctx.fillStyle = pGlow;
+        ctx.arc(p.x, p.y, p.size * 3.5, 0, Math.PI * 2);
         ctx.fill();
 
-        // Recycle / Remove dead particles
+        // Recycle dead particles
         if (p.y < -50 || p.x < -50 || p.x > width + 50 || p.alpha <= 0) {
           particles.splice(i, 1);
         }
@@ -241,36 +254,53 @@ export default function Welcome3D() {
     };
   }, [mounted]);
 
-  // 3D Card mouse interactions (direct DOM manipulation for 60fps)
+  // Masterpiece 3D Tilt, Dynamic Shadows and Reflection calculations
   const handleMouseMove3D = (e: React.MouseEvent<HTMLDivElement>) => {
     const card = cardRef.current;
     const container = containerRef.current;
     const sheen = sheenRef.current;
+    const logo = logoRef.current;
+    const title = titleRef.current;
+    const subtitle = subtitleRef.current;
+    
     if (!card || !container) return;
 
     const rect = container.getBoundingClientRect();
-    
-    // Relative coordinates inside the container
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
 
-    // Centered coordinates (-0.5 to 0.5)
     const px = (x / rect.width) - 0.5;
     const py = (y / rect.height) - 0.5;
 
-    // Custom tilt settings (max 20deg)
-    const maxTilt = 18;
+    // Extreme, smooth 3D tilt angles (max 22 degrees)
+    const maxTilt = 22;
     const rotX = -py * maxTilt;
     const rotY = px * maxTilt;
 
-    // Apply tilt transform
-    card.style.transform = `perspective(1200px) rotateX(${rotX}deg) rotateY(${rotY}deg) scale3d(1.04, 1.04, 1.04)`;
+    // Apply card transform
+    card.style.transform = `perspective(1500px) rotateX(${rotX}deg) rotateY(${rotY}deg) scale3d(1.05, 1.05, 1.05)`;
 
-    // Move sheen gradient in opposite direction to simulate reflection
+    // Interactive reflection sheen (moving in opposite direction)
     if (sheen) {
       const sheenX = (1 - (x / rect.width)) * 100;
       const sheenY = (1 - (y / rect.height)) * 100;
-      sheen.style.background = `radial-gradient(circle at ${sheenX}% ${sheenY}%, rgba(200, 169, 126, 0.18) 0%, transparent 65%)`;
+      sheen.style.background = `radial-gradient(circle at ${sheenX}% ${sheenY}%, rgba(255, 223, 137, 0.22) 0%, transparent 60%)`;
+      sheen.style.opacity = '1';
+    }
+
+    // Dynamic Shadow Shift under the floating logo (simulates 3D spatial height)
+    if (logo) {
+      const shadowX = -px * 32;
+      const shadowY = -py * 32;
+      logo.style.transform = `translateZ(100px) scale(1.06)`;
+      logo.style.filter = `drop-shadow(${shadowX}px ${shadowY}px 18px rgba(0, 0, 0, 0.75)) drop-shadow(0 0 12px rgba(200, 169, 126, 0.3))`;
+    }
+
+    // Dynamic metallic Gold Foil text shimmer effect
+    if (title && subtitle) {
+      const textAngle = ((px + 0.5) * 360).toFixed(0);
+      title.style.backgroundImage = `linear-gradient(${textAngle}deg, #A88B5E 0%, #F5E5C9 30%, #C8A97E 60%, #B8860B 100%)`;
+      subtitle.style.backgroundImage = `linear-gradient(${textAngle}deg, #A88B5E 0%, #F5E5C9 30%, #C8A97E 60%, #B8860B 100%)`;
     }
   };
 
@@ -278,6 +308,8 @@ export default function Welcome3D() {
     const card = cardRef.current;
     const container = containerRef.current;
     const sheen = sheenRef.current;
+    const logo = logoRef.current;
+    
     if (!card || !container || e.touches.length === 0) return;
 
     const rect = container.getBoundingClientRect();
@@ -286,55 +318,74 @@ export default function Welcome3D() {
     const x = touch.clientX - rect.left;
     const y = touch.clientY - rect.top;
 
-    // Ignore if touch drifts outside the bounds
     if (x < 0 || x > rect.width || y < 0 || y > rect.height) return;
 
     const px = (x / rect.width) - 0.5;
     const py = (y / rect.height) - 0.5;
 
-    const maxTilt = 12; // slightly less tilt for mobile touch
+    const maxTilt = 16;
     const rotX = -py * maxTilt;
     const rotY = px * maxTilt;
 
-    card.style.transform = `perspective(1000px) rotateX(${rotX}deg) rotateY(${rotY}deg) scale3d(1.03, 1.03, 1.03)`;
+    card.style.transform = `perspective(1200px) rotateX(${rotX}deg) rotateY(${rotY}deg) scale3d(1.03, 1.03, 1.03)`;
 
     if (sheen) {
       const sheenX = (1 - (x / rect.width)) * 100;
       const sheenY = (1 - (y / rect.height)) * 100;
-      sheen.style.background = `radial-gradient(circle at ${sheenX}% ${sheenY}%, rgba(200, 169, 126, 0.15) 0%, transparent 60%)`;
+      sheen.style.background = `radial-gradient(circle at ${sheenX}% ${sheenY}%, rgba(255, 223, 137, 0.16) 0%, transparent 60%)`;
+    }
+
+    if (logo) {
+      const shadowX = -px * 20;
+      const shadowY = -py * 20;
+      logo.style.transform = `translateZ(80px) scale(1.04)`;
+      logo.style.filter = `drop-shadow(${shadowX}px ${shadowY}px 12px rgba(0, 0, 0, 0.7)) drop-shadow(0 0 8px rgba(200, 169, 126, 0.25))`;
     }
   };
 
   const handleMouseLeave3D = () => {
     const card = cardRef.current;
     const sheen = sheenRef.current;
+    const logo = logoRef.current;
+    const title = titleRef.current;
+    const subtitle = subtitleRef.current;
+    
     if (!card) return;
 
-    // Reset card transforms smoothly
-    card.style.transform = 'perspective(1200px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)';
+    // Reset card smooth ease-out
+    card.style.transform = 'perspective(1500px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)';
     
-    // Reset sheen
     if (sheen) {
       sheen.style.background = 'transparent';
+      sheen.style.opacity = '0';
+    }
+
+    if (logo) {
+      logo.style.transform = 'translateZ(75px) scale(1)';
+      logo.style.filter = 'drop-shadow(0 15px 25px rgba(0, 0, 0, 0.55)) drop-shadow(0 0 6px rgba(200, 169, 126, 0.2))';
+    }
+
+    if (title && subtitle) {
+      title.style.backgroundImage = 'linear-gradient(135deg, #B8860B 0%, #E8D5B7 50%, #C8A97E 100%)';
+      subtitle.style.backgroundImage = 'linear-gradient(135deg, #A88B5E 0%, #E8D5B7 50%, #A88B5E 100%)';
     }
   };
 
-  // Immediate redirection transition trigger
+  // Cinematic page transition zoom trigger
   const handleEnterMenu = () => {
     if (isExiting) return;
     setIsExiting(true);
 
-    // Apply intense camera zoom-in directly to the card
     const card = cardRef.current;
     if (card) {
-      card.style.transition = 'transform 0.8s cubic-bezier(0.7, 0, 0.3, 1), opacity 0.7s ease-out';
-      card.style.transform = 'perspective(1200px) rotateX(0deg) rotateY(0deg) translateZ(300px) scale3d(1.8, 1.8, 1.8)';
+      card.style.transition = 'transform 0.9s cubic-bezier(0.7, 0, 0.2, 1), opacity 0.8s ease-out';
+      card.style.transform = 'perspective(1500px) rotateX(0deg) rotateY(0deg) translateZ(500px) scale3d(2.2, 2.2, 2.2)';
       card.style.opacity = '0';
     }
 
     setTimeout(() => {
       router.push('/menu');
-    }, 750);
+    }, 850);
   };
 
   if (!mounted) return null;
@@ -342,29 +393,34 @@ export default function Welcome3D() {
   return (
     <div
       className={clsx(
-        'relative min-h-screen w-full flex flex-col items-center justify-center overflow-hidden font-cairo select-none transition-all duration-700',
-        isExiting ? 'opacity-0 bg-brand-white dark:bg-brand-black scale-98 pointer-events-none' : 'opacity-100'
+        'relative min-h-screen w-full flex flex-col items-center justify-center overflow-hidden font-cairo select-none transition-all duration-1000 bg-[#070403]',
+        isExiting ? 'opacity-0 bg-[#070403] scale-98 pointer-events-none' : 'opacity-100'
       )}
     >
-      {/* Dynamic Interactive Canvas */}
+      {/* Background Canvas Particles */}
       <canvas ref={canvasRef} className="absolute inset-0 w-full h-full z-0 block pointer-events-none" />
 
-      {/* Top Bar (Theme switcher & dynamic welcome badge) */}
+      {/* Floating 3D Sparkles in space (Parallax background layers) */}
+      <div className="absolute top-1/4 left-1/10 w-2 h-2 bg-brand-beige-light rounded-full blur-[1px] animate-pulse opacity-60 z-10 pointer-events-none" style={{ transform: 'translateZ(-150px)' }} />
+      <div className="absolute bottom-1/4 right-1/10 w-3 h-3 bg-brand-gold rounded-full blur-[2px] animate-ping opacity-30 z-10 pointer-events-none" style={{ transform: 'translateZ(-100px)', animationDuration: '6s' }} />
+      <div className="absolute top-1/3 right-1/5 w-1.5 h-1.5 bg-white rounded-full blur-none animate-pulse opacity-85 z-10 pointer-events-none" style={{ transform: 'translateZ(-50px)' }} />
+
+      {/* Top Navigation Bar */}
       <div className="absolute top-6 left-6 right-6 flex items-center justify-between z-40 max-w-5xl mx-auto w-full px-6">
-        <div className="flex items-center gap-2 bg-white/40 dark:bg-black/20 backdrop-blur-md border border-white/30 dark:border-white/5 py-1.5 px-3.5 rounded-full shadow-sm text-xs font-semibold text-brand-beige-dark dark:text-brand-beige-light">
-          <Sparkles className="h-3.5 w-3.5 text-brand-beige animate-pulse" />
-          <span>تذوق الأصالة • Taste the Heritage</span>
+        <div className="flex items-center gap-2.5 bg-black/60 backdrop-blur-xl border border-brand-beige/25 py-2 px-4 rounded-full shadow-[0_0_20px_rgba(200,169,126,0.1)] text-xs font-bold text-brand-beige-light">
+          <Sparkles className="h-3.5 w-3.5 text-brand-gold animate-bounce" />
+          <span>تألق الفخامة • Cafe Adnan Experience</span>
         </div>
         <button
           onClick={toggleTheme}
-          className="p-3 rounded-full transition-all duration-300 hover:scale-105 active:scale-95 bg-white/50 dark:bg-black/30 backdrop-blur-md border border-white/30 dark:border-white/5 shadow-md text-brand-gray-700 dark:text-brand-gray-300 hover:text-brand-beige-dark dark:hover:text-brand-beige-light"
+          className="p-3.5 rounded-full transition-all duration-300 hover:scale-105 active:scale-95 bg-black/60 backdrop-blur-xl border border-brand-beige/25 shadow-[0_0_20px_rgba(200,169,126,0.1)] text-brand-beige hover:text-brand-gold"
           aria-label="Toggle Theme"
         >
           {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
         </button>
       </div>
 
-      {/* Main 3D Interactive Container */}
+      {/* Interactive 3D Card Area */}
       <div
         ref={containerRef}
         onMouseMove={handleMouseMove3D}
@@ -372,146 +428,182 @@ export default function Welcome3D() {
         onTouchMove={handleTouchMove3D}
         onTouchEnd={handleMouseLeave3D}
         onMouseEnter={() => setIsHovering(true)}
-        onMouseOver={() => setIsHovering(true)}
-        onMouseOut={() => setIsHovering(false)}
-        className="relative z-10 w-full max-w-sm md:max-w-md aspect-[3/4] flex items-center justify-center p-6 cursor-grab active:cursor-grabbing"
+        className="relative z-10 w-full max-w-[370px] md:max-w-[430px] aspect-[10/14] flex items-center justify-center p-5 cursor-grab active:cursor-grabbing"
       >
-        {/* Holographic glowing back aura */}
+        {/* Holographic Glowing Pedestal Aura behind the card */}
         <div 
           className={clsx(
-            'absolute inset-10 rounded-full blur-[80px] opacity-40 transition-all duration-1000 z-0 pointer-events-none',
+            'absolute inset-5 rounded-full blur-[90px] opacity-40 transition-all duration-1000 z-0 pointer-events-none',
             isHovering 
-              ? 'bg-brand-beige dark:bg-brand-gold scale-110 blur-[100px] opacity-55' 
-              : 'bg-brand-beige-light dark:bg-brand-beige opacity-35'
+              ? 'bg-brand-gold scale-120 blur-[110px] opacity-60' 
+              : 'bg-brand-beige opacity-35'
           )}
         />
 
-        {/* The 3D Glassmorphic Card */}
+        {/* The 3D Glassmorphic Slab (Masterpiece structure) */}
         <div
           ref={cardRef}
           onClick={handleEnterMenu}
-          style={{ transformStyle: 'preserve-3d', transition: isHovering ? 'none' : 'transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1)' }}
+          style={{ transformStyle: 'preserve-3d', transition: isHovering ? 'none' : 'transform 0.8s cubic-bezier(0.15, 0.85, 0.15, 1)' }}
           className={clsx(
-            'relative w-full h-full rounded-3xl z-10 overflow-hidden flex flex-col items-center justify-between p-8 md:p-10 border text-center transition-shadow duration-500',
-            'bg-white/45 dark:bg-brand-black/45 backdrop-blur-xl',
-            'border-white/40 dark:border-white/10',
-            'shadow-[0_20px_50px_rgba(0,0,0,0.06)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.5)]',
-            isHovering ? 'shadow-[0_30px_70px_rgba(200,169,126,0.18)] dark:shadow-[0_30px_70px_rgba(200,169,126,0.12)]' : ''
+            'relative w-full h-full rounded-[36px] z-10 overflow-hidden flex flex-col items-center justify-between p-8 md:p-9 text-center transition-all duration-500',
+            // Dedicated High-End Dark Luxury Theme for supreme contrast
+            'bg-black/75 backdrop-blur-2xl',
+            'border-2 border-brand-beige/35',
+            'shadow-[0_25px_60px_rgba(0,0,0,0.85),_inset_0_2px_4px_rgba(255,255,255,0.15)]',
+            isHovering ? 'shadow-[0_30px_70px_rgba(200,169,126,0.22),_0_0_40px_rgba(200,169,126,0.1)]' : ''
           )}
         >
-          {/* Dynamic Light Sheen Overlay */}
+          {/* Real Light Sheen Reflection Layer */}
           <div
             ref={sheenRef}
-            className="absolute inset-0 pointer-events-none z-30 transition-opacity duration-300"
+            className="absolute inset-0 pointer-events-none z-30 transition-opacity duration-300 opacity-0"
           />
 
-          {/* Card Geometric Accents (Preserve 3D depth) */}
-          <div 
-            style={{ transform: 'translateZ(15px)' }} 
-            className="absolute top-4 left-4 w-4 h-4 border-t-2 border-l-2 border-brand-beige/50 rounded-tl" 
-          />
-          <div 
-            style={{ transform: 'translateZ(15px)' }} 
-            className="absolute top-4 right-4 w-4 h-4 border-t-2 border-r-2 border-brand-beige/50 rounded-tr" 
-          />
-          <div 
-            style={{ transform: 'translateZ(15px)' }} 
-            className="absolute bottom-4 left-4 w-4 h-4 border-b-2 border-l-2 border-brand-beige/50 rounded-bl" 
-          />
-          <div 
-            style={{ transform: 'translateZ(15px)' }} 
-            className="absolute bottom-4 right-4 w-4 h-4 border-b-2 border-r-2 border-brand-beige/50 rounded-br" 
-          />
+          {/* Double Beveled Glass Corners */}
+          <div style={{ transform: 'translateZ(20px)' }} className="absolute top-5 left-5 w-5 h-5 border-t-[3px] border-l-[3px] border-brand-gold/60 rounded-tl-md" />
+          <div style={{ transform: 'translateZ(20px)' }} className="absolute top-5 right-5 w-5 h-5 border-t-[3px] border-r-[3px] border-brand-gold/60 rounded-tr-md" />
+          <div style={{ transform: 'translateZ(20px)' }} className="absolute bottom-5 left-5 w-5 h-5 border-b-[3px] border-l-[3px] border-brand-gold/60 rounded-bl-md" />
+          <div style={{ transform: 'translateZ(20px)' }} className="absolute bottom-5 right-5 w-5 h-5 border-b-[3px] border-r-[3px] border-brand-gold/60 rounded-br-md" />
 
-          {/* Top Decorative Text (3D translateZ) */}
+          {/* Est badge inside card */}
           <span
-            style={{ transform: 'translateZ(30px)' }}
-            className="text-[10px] tracking-[0.25em] uppercase text-brand-beige-dark font-medium opacity-80"
+            style={{ transform: 'translateZ(35px)' }}
+            className="text-[10px] tracking-[0.3em] uppercase text-brand-beige-light font-bold opacity-80 font-inter flex items-center gap-1.5"
           >
-            Est. 2024
+            <Coffee className="h-3 w-3 text-brand-gold" /> EST. 2024
           </span>
 
-          {/* 3D Floating Logo Section */}
+          {/* 3D ORBITAL SYSTEM (The Masterpiece 3D orbits) */}
           <div
-            style={{ transform: 'translateZ(75px)', transformStyle: 'preserve-3d' }}
-            className="relative flex items-center justify-center my-6 group"
+            style={{ transform: 'translateZ(80px)', transformStyle: 'preserve-3d' }}
+            className="relative w-44 h-44 md:w-52 md:h-52 flex items-center justify-center my-4 group z-20"
           >
-            {/* Soft inner glow behind logo */}
-            <div className="absolute inset-0 w-32 h-32 md:w-36 md:h-36 rounded-full bg-radial from-brand-beige-light/35 to-transparent blur-2xl dark:from-brand-gold/15" />
-            
+            {/* Holographic orbital ring 1 (Rotated 3D) */}
+            <div 
+              style={{ 
+                transform: 'rotateX(72deg) rotateY(15deg) translateZ(0px)',
+                border: '1.5px dashed rgba(200, 169, 126, 0.4)',
+                boxShadow: '0 0 15px rgba(200, 169, 126, 0.15), inset 0 0 15px rgba(200, 169, 126, 0.15)'
+              }}
+              className="absolute w-52 h-52 rounded-full animate-[spin_12s_linear_infinite] pointer-events-none" 
+            />
+
+            {/* Holographic orbital ring 2 (Rotated 3D Counter-clockwise) */}
+            <div 
+              style={{ 
+                transform: 'rotateX(64deg) rotateY(-20deg) translateZ(5px)',
+                border: '1px solid rgba(184, 134, 11, 0.35)',
+                boxShadow: '0 0 20px rgba(184, 134, 11, 0.2)'
+              }}
+              className="absolute w-44 h-44 rounded-full animate-[spin_18s_linear_infinite_reverse] pointer-events-none" 
+            />
+
+            {/* Outer halo disk glow */}
+            <div className="absolute inset-2 rounded-full bg-radial from-brand-gold/20 via-brand-beige/5 to-transparent blur-2xl animate-pulse pointer-events-none" />
+
+            {/* Absolute Floating Logo Image (with dynamic shadow and shift) */}
             <img
+              ref={logoRef}
               src="/logo.png"
               alt="Cafe Adnan Logo"
+              style={{ 
+                transform: 'translateZ(75px)',
+                transition: 'transform 0.15s ease-out, filter 0.15s ease-out',
+                filter: 'drop-shadow(0 15px 25px rgba(0, 0, 0, 0.55)) drop-shadow(0 0 6px rgba(200, 169, 126, 0.2))'
+              }}
               className={clsx(
-                'h-36 w-36 md:h-40 md:w-40 object-contain drop-shadow-[0_10px_25px_rgba(0,0,0,0.15)] dark:drop-shadow-[0_10px_25px_rgba(200,169,126,0.35)]',
-                'transition-all duration-500 scale-100 group-hover:scale-105',
-                // Keep inverted style for light mode, original light logo for dark mode
-                'invert dark:invert-0'
+                'h-32 w-32 md:h-36 md:w-36 object-contain pointer-events-none',
+                // Keep original light-color logo visible on dark theme (non-inverted)
+                'invert-0'
               )}
             />
           </div>
 
-          {/* 3D Branding & Typography */}
+          {/* 3D Typographic Section with Metallic Gold foil reflection */}
           <div 
-            style={{ transform: 'translateZ(45px)' }} 
-            className="flex flex-col items-center gap-2.5 w-full"
+            style={{ transform: 'translateZ(50px)', transformStyle: 'preserve-3d' }} 
+            className="flex flex-col items-center gap-2.5 w-full z-10"
           >
-            <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-brand-black dark:text-brand-white">
+            <h1 
+              ref={titleRef}
+              style={{ 
+                backgroundImage: 'linear-gradient(135deg, #B8860B 0%, #E8D5B7 50%, #C8A97E 100%)',
+                backgroundClip: 'text',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                transition: 'background-image 0.1s ease-out',
+                textShadow: '0 5px 15px rgba(0,0,0,0.4)'
+              }}
+              className="text-3xl md:text-4xl font-extrabold tracking-wide"
+            >
               قهوة عدنان
             </h1>
-            <h2 className="text-sm tracking-[0.15em] font-medium text-brand-beige-dark dark:text-brand-beige-light uppercase -mt-1 font-inter">
+            <h2 
+              ref={subtitleRef}
+              style={{ 
+                backgroundImage: 'linear-gradient(135deg, #A88B5E 0%, #E8D5B7 50%, #A88B5E 100%)',
+                backgroundClip: 'text',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                transition: 'background-image 0.1s ease-out',
+                textShadow: '0 3px 8px rgba(0,0,0,0.4)'
+              }}
+              className="text-sm tracking-[0.2em] font-bold uppercase -mt-0.5 font-inter"
+            >
               Cafe Adnan
             </h2>
-            <div className="w-12 h-[1.5px] bg-gradient-to-r from-transparent via-brand-beige to-transparent my-1" />
-            <p className="text-xs md:text-sm text-brand-gray-500 dark:text-brand-gray-400 max-w-[240px] leading-relaxed">
+            <div style={{ transform: 'translateZ(20px)' }} className="w-16 h-[2px] bg-gradient-to-r from-transparent via-brand-gold to-transparent my-1.5 shadow-[0_0_8px_rgba(184,134,11,0.5)]" />
+            <p className="text-xs md:text-sm text-brand-beige-light font-semibold max-w-[260px] leading-relaxed opacity-95">
               حيث تلتقي الأصالة بالفخامة
               <br />
-              <span className="text-[10px] text-brand-gray-400 dark:text-brand-gray-500 italic font-inter block mt-1">
+              <span className="text-[10px] text-brand-gray-400 italic font-inter block mt-1 font-normal">
                 Where Authenticity Meets Luxury
               </span>
             </p>
           </div>
 
-          {/* Interactive Luxury Enter Button (3D translateZ) */}
+          {/* Interactive Luxury Neon Enter Button */}
           <div
-            style={{ transform: 'translateZ(55px)' }}
-            className="w-full flex flex-col items-center gap-4 mt-6"
+            style={{ transform: 'translateZ(65px)' }}
+            className="w-full flex flex-col items-center gap-4 mt-5 z-20"
           >
             <button
               onClick={(e) => {
-                e.stopPropagation(); // Avoid double trigger due to card click
+                e.stopPropagation();
                 handleEnterMenu();
               }}
               className={clsx(
-                'relative w-full py-4.5 px-6 rounded-2xl flex items-center justify-center gap-3 overflow-hidden transition-all duration-300 font-semibold group shadow-md',
-                'bg-brand-black dark:bg-brand-beige text-brand-white dark:text-brand-black hover:scale-[1.02] active:scale-98 cursor-pointer'
+                'relative w-full py-4.5 px-6 rounded-2xl flex items-center justify-center gap-3 overflow-hidden transition-all duration-300 font-bold group shadow-lg cursor-pointer',
+                'bg-gradient-to-r from-brand-beige to-brand-gold text-brand-black hover:scale-[1.03] active:scale-97 hover:shadow-[0_0_30px_rgba(200,169,126,0.35)]'
               )}
             >
-              {/* Internal pulsating shine animation for button */}
-              <div className="absolute inset-0 w-1/2 h-full bg-gradient-to-r from-transparent via-white/15 dark:via-black/5 to-transparent -skew-x-12 translate-x-[-150%] group-hover:translate-x-[250%] transition-transform duration-1000 ease-out" />
+              {/* Gold lightning speed sheen streak */}
+              <div className="absolute inset-0 w-1/3 h-full bg-gradient-to-r from-transparent via-white/40 to-transparent -skew-x-12 translate-x-[-150%] group-hover:translate-x-[250%] transition-transform duration-1000 ease-out" />
               
-              <span className="text-sm md:text-base tracking-wide">دخول القائمة | Explore Menu</span>
-              <ArrowRight className="h-4 w-4 md:h-5 md:w-5 transition-transform duration-300 group-hover:translate-x-1 rtl:rotate-180" />
+              <span className="text-sm md:text-base tracking-wider">دخول القائمة | Explore Menu</span>
+              <ArrowRight className="h-4 w-4 md:h-5 md:w-5 transition-transform duration-300 group-hover:translate-x-1.5 rtl:rotate-180" />
             </button>
           </div>
         </div>
       </div>
 
-      {/* Auto-redirect bottom progress bar & skip prompt */}
-      <div className="absolute bottom-10 left-6 right-6 flex flex-col items-center gap-4 z-40 max-w-sm mx-auto">
-        <div className="w-full h-1 bg-brand-gray-200 dark:bg-brand-gray-800 rounded-full overflow-hidden">
+      {/* Auto-redirect bottom progress indicator & skip prompt */}
+      <div className="absolute bottom-10 left-6 right-6 flex flex-col items-center gap-4.5 z-40 max-w-sm mx-auto w-full">
+        <div className="w-full h-1.5 bg-black/60 border border-brand-beige/10 rounded-full overflow-hidden shadow-[inset_0_1px_3px_rgba(0,0,0,0.5)]">
           <div
             style={{ width: `${countdown}%` }}
-            className="h-full bg-gradient-to-r from-brand-beige to-brand-gold rounded-full transition-all duration-75 linear"
+            className="h-full bg-gradient-to-r from-brand-beige-dark via-brand-beige to-brand-gold rounded-full transition-all duration-75 linear shadow-[0_0_8px_rgba(184,134,11,0.5)]"
           />
         </div>
         
         {showSkipPrompt && (
           <button
             onClick={handleEnterMenu}
-            className="text-[11px] text-brand-gray-400 hover:text-brand-beige transition-colors duration-200 uppercase tracking-widest font-inter cursor-pointer animate-fadeIn"
+            className="text-[11px] font-bold text-brand-beige/85 hover:text-brand-gold transition-colors duration-200 uppercase tracking-widest font-inter cursor-pointer animate-fadeIn flex items-center gap-1.5 bg-black/40 py-1.5 px-3 rounded-full border border-white/5"
           >
-            الانتقال التلقائي قريباً... اضغط للدخول الآن
+            <span className="inline-block w-1.5 h-1.5 rounded-full bg-brand-gold animate-ping" />
+            الانتقال التلقائي قريباً... اضغط للدخول
           </button>
         )}
       </div>
