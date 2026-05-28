@@ -7,10 +7,10 @@ import { QRCard } from '@/components/admin/QRCard';
 export default function QRPage() {
   const [url, setUrl] = useState(
     typeof window !== 'undefined'
-      ? `${window.location.origin}/menu`
+      ? `${window.location.origin}`
       : process.env.NEXT_PUBLIC_SITE_URL
-        ? `${process.env.NEXT_PUBLIC_SITE_URL}/menu`
-        : 'https://cafeadnan.com/menu'
+        ? `${process.env.NEXT_PUBLIC_SITE_URL}`
+        : 'https://cafeadnan.com'
   );
   const printRef = useRef<HTMLDivElement>(null);
 
@@ -35,15 +35,15 @@ export default function QRPage() {
       // 1. Load brand logo first
       const logoImg = new Image();
       logoImg.crossOrigin = 'anonymous';
-      
+
       logoImg.onload = () => {
         // 2. Load QR Code SVG image
         const svgData = new XMLSerializer().serializeToString(svgEl);
         const qrImg = new Image();
-        
+
         qrImg.onload = () => {
           // --- BEGIN DRAWING ---
-          
+
           // Clear with white background
           ctx.fillStyle = '#ffffff';
           // Draw rounded rectangle container
@@ -80,7 +80,7 @@ export default function QRPage() {
 
           // Draw bilingual texts
           ctx.textAlign = 'center';
-          
+
           // Arabic Text
           ctx.fillStyle = '#1f2937'; // text-gray-800
           ctx.font = 'bold 28px Cairo, system-ui, sans-serif';
