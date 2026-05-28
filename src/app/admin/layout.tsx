@@ -28,11 +28,21 @@ export default function AdminLayout({
       try {
         const supabase = createClient();
         const { data: { user } } = await supabase.auth.getUser();
-        if (!user) {
-          window.location.href = '/admin/login';
-        } else {
+        
+        if (user) {
           setAuthLoading(false);
+          return;
         }
+
+        // Check custom local fallback session (for legacy Safari/ITP bypass)
+        const customSession = localStorage.getItem('cafe-adnan-custom-session');
+        if (customSession === 'true') {
+          setAuthLoading(false);
+          return;
+        }
+
+        // If neither session is valid, redirect to login
+        window.location.href = '/admin/login';
       } catch {
         window.location.href = '/admin/login';
       }

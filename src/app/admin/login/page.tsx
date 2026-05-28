@@ -18,17 +18,34 @@ export default function AdminLoginPage() {
 
     try {
       const supabase = createClient();
+      
+      // 1. Try standard Supabase Auth first
       const { error: authError } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
-      if (authError) {
-        setError('البريد الإلكتروني أو كلمة المرور غير صحيحة');
+      if (!authError) {
+        localStorage.removeItem('cafe-adnan-custom-session');
+        window.location.href = '/admin/dashboard';
         return;
       }
 
-      window.location.href = '/admin/dashboard';
+      // 2. If standard Auth fails, check the secure Custom Fallback (RPC)
+      // This bypasses Safari cookie/ITP blocking seamlessly for older devices
+      const { data: isCustomValid, error: rpcError } = await supabase.rpc('verify_admin_credentials', {
+        admin_email: email.trim().toLowerCase(),
+        admin_password: password.trim()
+      });
+
+      if (!rpcError && isCustomValid) {
+        localStorage.setItem('cafe-adnan-custom-session', 'true');
+        localStorage.setItem('cafe-adnan-custom-email', email.trim().toLowerCase());
+        window.location.href = '/admin/dashboard';
+        return;
+      }
+
+      setError('البريد الإلكتروني أو كلمة المرور غير صحيحة');
     } catch {
       setError('حدث خطأ غير متوقع');
     } finally {
