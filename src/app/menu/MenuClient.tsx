@@ -18,14 +18,10 @@ interface MenuClientProps {
 export default function MenuClient({ initialCategories, initialItems }: MenuClientProps) {
   const { menuSections, categories, loading } = useMenu(initialCategories, initialItems);
   const [search, setSearch] = useState('');
-  const [activeCategory, setActiveCategory] = useState<string | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
-  // Set initial active category
-  useEffect(() => {
-    if (categories.length > 0 && !activeCategory) {
-      setActiveCategory(categories[0].id);
-    }
-  }, [categories, activeCategory]);
+  // Compute activeCategory: either user selected or default to the first category
+  const activeCategory = selectedCategory || (categories.length > 0 ? categories[0].id : null);
 
   // Track active category based on scroll position
   useEffect(() => {
@@ -42,7 +38,7 @@ export default function MenuClient({ initialCategories, initialItems }: MenuClie
       );
 
       if (closest.id) {
-        setActiveCategory(closest.id);
+        setSelectedCategory(closest.id);
       }
     };
 
@@ -52,7 +48,7 @@ export default function MenuClient({ initialCategories, initialItems }: MenuClie
 
   // Handle category selection
   const handleCategorySelect = useCallback((id: string) => {
-    setActiveCategory(id);
+    setSelectedCategory(id);
     const el = document.getElementById(`category-${id}`);
     if (el) {
       el.scrollIntoView({ behavior: 'smooth', block: 'start' });

@@ -6,7 +6,6 @@ import { LayoutDashboard, FolderOpen, UtensilsCrossed, QrCode, X, LogOut, Receip
 import { Logo } from '@/components/Logo';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { createClient } from '@/lib/supabase/client';
-import { useRouter } from 'next/navigation';
 import clsx from 'clsx';
 
 interface AdminSidebarProps {
@@ -24,13 +23,11 @@ const navItems = [
 
 export function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
   const pathname = usePathname();
-  const router = useRouter();
 
   const handleLogout = async () => {
     const supabase = createClient();
     await supabase.auth.signOut();
-    router.push('/admin/login');
-    router.refresh();
+    window.location.href = '/admin/login';
   };
 
   return (
@@ -55,7 +52,7 @@ export function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
       >
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-brand-gray-100 dark:border-brand-gray-800">
-          <Logo size="sm" showSubtitle={false} />
+          <Logo size="sm" />
           <div className="flex items-center gap-1">
             <ThemeToggle />
             <button

@@ -10,7 +10,7 @@ interface ThemeContextType {
 }
 
 const ThemeContext = createContext<ThemeContextType>({
-  theme: 'light',
+  theme: 'dark',
   toggleTheme: () => {},
 });
 
@@ -19,35 +19,24 @@ export function useTheme() {
 }
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [theme, setTheme] = useState<Theme>('light');
+  const [theme, setTheme] = useState<Theme>('dark');
   const [mounted, setMounted] = useState(false);
 
-  // Initialize theme based on localStorage or system preference
+  // Initialize theme based on localStorage
   useEffect(() => {
-    setMounted(true);
-    const stored = localStorage.getItem('cafe-adnan-theme') as Theme | null;
-    if (stored) {
-      setTheme(stored);
-    } else {
-      const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      setTheme(systemDark ? 'dark' : 'light');
-    }
-  }, []);
-
-  // Listen to system preference changes (only sync if user hasn't set manual override)
-  useEffect(() => {
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    
-    const handleChange = (e: MediaQueryListEvent) => {
-      const stored = localStorage.getItem('cafe-adnan-theme');
-      if (!stored) {
-        setTheme(e.matches ? 'dark' : 'light');
+    const timer = setTimeout(() => {
+      setMounted(true);
+      const stored = localStorage.getItem('cafe-adnan-theme') as Theme | null;
+      if (stored) {
+        setTheme(stored);
+      } else {
+        setTheme('dark');
       }
-    };
-
-    mediaQuery.addEventListener('change', handleChange);
-    return () => mediaQuery.removeEventListener('change', handleChange);
+    }, 0);
+    return () => clearTimeout(timer);
   }, []);
+
+
 
   // Update DOM when theme state changes
   useEffect(() => {

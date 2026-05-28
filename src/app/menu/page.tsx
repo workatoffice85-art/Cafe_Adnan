@@ -1,6 +1,7 @@
 import MenuClient from './MenuClient';
 import { createClient } from '@supabase/supabase-js';
 import type { Metadata } from 'next';
+import type { Category, MenuItem } from '@/types/database';
 
 export const metadata: Metadata = {
   title: 'القائمة | Cafe Adnan',
@@ -15,8 +16,8 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
 export default async function MenuPage() {
-  let initialCategories: any[] = [];
-  let initialItems: any[] = [];
+  let initialCategories: Category[] = [];
+  let initialItems: MenuItem[] = [];
 
   if (supabaseUrl && supabaseAnonKey) {
     try {

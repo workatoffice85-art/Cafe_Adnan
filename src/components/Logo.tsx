@@ -3,11 +3,10 @@ import clsx from 'clsx';
 interface LogoProps {
   size?: 'sm' | 'md' | 'lg';
   className?: string;
-  showSubtitle?: boolean;
   forceInvert?: boolean;
 }
 
-export function Logo({ size = 'md', className, showSubtitle = true, forceInvert = false }: LogoProps) {
+export function Logo({ size = 'md', className, forceInvert = false }: LogoProps) {
   const sizes = {
     sm: 'h-16 md:h-18 w-auto',
     md: 'h-28 md:h-32 w-auto',

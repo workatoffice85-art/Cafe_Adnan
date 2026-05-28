@@ -31,18 +31,41 @@ export default function Welcome3D() {
   const isExitingRef = useRef(false);
   const themeRef = useRef(theme);
 
+  // Snappy smooth hardware-accelerated exit navigation
+  const handleEnterMenu = useCallback(() => {
+    if (isExiting) return;
+    setIsExiting(true);
+    isExitingRef.current = true; // Instantly halts rendering loops
+
+    const card = cardRef.current;
+    if (card) {
+      card.style.transition = 'transform 0.5s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.45s ease-out';
+      card.style.transform = 'perspective(1500px) rotateX(0deg) rotateY(0deg) translateZ(350px) scale3d(1.8, 1.8, 1.8)';
+      card.style.opacity = '0';
+    }
+
+    setTimeout(() => {
+      router.push('/menu');
+    }, 450);
+  }, [isExiting, router]);
+
   // Sync theme changes to the animation ref
   useEffect(() => {
     themeRef.current = theme;
   }, [theme]);
 
   useEffect(() => {
-    setMounted(true);
+    const timer = setTimeout(() => {
+      setMounted(true);
+    }, 0);
     // Prefetch the menu page immediately on mount so navigation is instant
     router.prefetch('/menu');
     // Show skip prompt after 2 seconds
     const promptTimer = setTimeout(() => setShowSkipPrompt(true), 2500);
-    return () => clearTimeout(promptTimer);
+    return () => {
+      clearTimeout(timer);
+      clearTimeout(promptTimer);
+    };
   }, [router]);
 
   // Countdown timer for automatic redirect
@@ -63,7 +86,7 @@ export default function Welcome3D() {
     }, 16); // ~60fps
 
     return () => clearInterval(interval);
-  }, [mounted, isExiting]);
+  }, [mounted, isExiting, handleEnterMenu]);
 
   // Canvas particle system (Warm Golden Steam & Stardust - Supports Light & Dark Gradients)
   useEffect(() => {
@@ -418,23 +441,6 @@ export default function Welcome3D() {
     }
   };
 
-  // Snappy smooth hardware-accelerated exit navigation
-  const handleEnterMenu = () => {
-    if (isExiting) return;
-    setIsExiting(true);
-    isExitingRef.current = true; // Instantly halts rendering loops
-
-    const card = cardRef.current;
-    if (card) {
-      card.style.transition = 'transform 0.5s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.45s ease-out';
-      card.style.transform = 'perspective(1500px) rotateX(0deg) rotateY(0deg) translateZ(350px) scale3d(1.8, 1.8, 1.8)';
-      card.style.opacity = '0';
-    }
-
-    setTimeout(() => {
-      router.push('/menu');
-    }, 450);
-  };
 
   if (!mounted) return null;
 

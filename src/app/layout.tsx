@@ -46,7 +46,7 @@ export default function RootLayout({
             __html: `
               try {
                 const theme = localStorage.getItem('cafe-adnan-theme');
-                if (theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                if (theme !== 'light') {
                   document.documentElement.classList.add('dark');
                 }
               } catch (e) {}

@@ -34,7 +34,10 @@ export function useMenu(initialCategories?: Category[], initialItems?: MenuItem[
 
   // Initial fetch
   useEffect(() => {
-    fetchData();
+    const timer = setTimeout(() => {
+      fetchData();
+    }, 0);
+    return () => clearTimeout(timer);
   }, [fetchData]);
 
   // Realtime subscriptions
