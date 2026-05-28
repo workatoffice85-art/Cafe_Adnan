@@ -25,7 +25,10 @@ export default function Welcome3D() {
   const [isHovering, setIsHovering] = useState(false);
   const [showSkipPrompt, setShowSkipPrompt] = useState(false);
 
-  const COUNTDOWN_DURATION = 7000; // 7 seconds to let them enjoy the 3D masterpiece
+  const COUNTDOWN_DURATION = 7000; // 7 seconds
+
+  // Use a ref to track exit state inside the high-frequency canvas render loop (prevents stale closure lag!)
+  const isExitingRef = useRef(false);
 
   useEffect(() => {
     setMounted(true);
@@ -79,6 +82,7 @@ export default function Welcome3D() {
     };
 
     const handleMouseMove = (e: MouseEvent) => {
+      if (isExitingRef.current) return;
       mouse.x = e.clientX;
       mouse.y = e.clientY;
       mouse.active = true;
@@ -90,6 +94,7 @@ export default function Welcome3D() {
     };
 
     const handleTouchMove = (e: TouchEvent) => {
+      if (isExitingRef.current) return;
       if (e.touches.length > 0) {
         mouse.x = e.touches[0].clientX;
         mouse.y = e.touches[0].clientY;
@@ -156,7 +161,12 @@ export default function Welcome3D() {
     }
 
     const render = () => {
-      // Luxurious Deep Pitch-Black Coffee Gradient background (always dark for premium contrast)
+      // CRITICAL PERFORMANCE: If exiting, terminate the render loop immediately to free up main thread for routing
+      if (isExitingRef.current) {
+        ctx.clearRect(0, 0, width, height);
+        return;
+      }
+
       const isDark = document.documentElement.classList.contains('dark');
       
       // Let's create an immersive warm dark theme by default, providing high-end gold contrast
@@ -170,7 +180,6 @@ export default function Welcome3D() {
         glowGrad.addColorStop(0.5, '#070403');
         glowGrad.addColorStop(1, '#020101');
       } else {
-        // High contrast luxury dark theme even on light mode, but with warmer accents
         glowGrad.addColorStop(0, '#18120e'); 
         glowGrad.addColorStop(0.6, '#0d0806');
         glowGrad.addColorStop(1, '#050302');
@@ -179,7 +188,7 @@ export default function Welcome3D() {
       ctx.fillStyle = glowGrad;
       ctx.fillRect(0, 0, width, height);
 
-      // Ambient luxury background beam (glowing gold columns)
+      // Ambient luxury background beam
       ctx.fillStyle = 'rgba(200, 169, 126, 0.015)';
       ctx.beginPath();
       ctx.ellipse(width / 2, height / 2, width * 0.3, height * 0.8, Math.PI / 6, 0, Math.PI * 2);
@@ -193,11 +202,9 @@ export default function Welcome3D() {
       for (let i = particles.length - 1; i >= 0; i--) {
         const p = particles[i];
 
-        // Particle movement
         p.x += p.vx;
         p.y += p.vy;
 
-        // Apply slight orbital drift for magical stardust look
         p.orbitOffset += p.orbitSpeed;
         p.x += Math.sin(p.orbitOffset) * 0.15;
 
@@ -217,14 +224,13 @@ export default function Welcome3D() {
           }
         }
 
-        // Environmental drift friction
         p.vx *= 0.97;
         if (p.interactive) {
           p.vy *= 0.97;
           p.alpha -= 0.007;
         } else {
           p.vy = Math.max(-1.8, p.vy - 0.005);
-          p.alpha -= 0.001; // environmental particles fade extremely slowly
+          p.alpha -= 0.001; 
         }
 
         // Draw particle with glowing aura
@@ -259,6 +265,8 @@ export default function Welcome3D() {
 
   // Masterpiece 3D Tilt, Dynamic Shadows and Reflection calculations
   const handleMouseMove3D = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (isExitingRef.current) return; // Freeze physical calculations during exit
+    
     const card = cardRef.current;
     const container = containerRef.current;
     const sheen = sheenRef.current;
@@ -308,6 +316,8 @@ export default function Welcome3D() {
   };
 
   const handleTouchMove3D = (e: React.TouchEvent<HTMLDivElement>) => {
+    if (isExitingRef.current) return;
+    
     const card = cardRef.current;
     const container = containerRef.current;
     const sheen = sheenRef.current;
@@ -347,6 +357,8 @@ export default function Welcome3D() {
   };
 
   const handleMouseLeave3D = () => {
+    if (isExitingRef.current) return;
+    
     const card = cardRef.current;
     const sheen = sheenRef.current;
     const logo = logoRef.current;
@@ -355,7 +367,6 @@ export default function Welcome3D() {
     
     if (!card) return;
 
-    // Reset card smooth ease-out
     card.style.transform = 'perspective(1500px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)';
     
     if (sheen) {
@@ -374,21 +385,24 @@ export default function Welcome3D() {
     }
   };
 
-  // Cinematic page transition zoom trigger
+  // Cinematic page transition zoom trigger with extreme performance enhancements
   const handleEnterMenu = () => {
     if (isExiting) return;
     setIsExiting(true);
+    isExitingRef.current = true; // Instantly halts the canvas loop and physics calculations
 
+    // Apply snappy, smooth hardware-accelerated cubic zoom-out directly to the card
     const card = cardRef.current;
     if (card) {
-      card.style.transition = 'transform 0.9s cubic-bezier(0.7, 0, 0.2, 1), opacity 0.8s ease-out';
-      card.style.transform = 'perspective(1500px) rotateX(0deg) rotateY(0deg) translateZ(500px) scale3d(2.2, 2.2, 2.2)';
+      card.style.transition = 'transform 0.5s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.45s ease-out';
+      card.style.transform = 'perspective(1500px) rotateX(0deg) rotateY(0deg) translateZ(350px) scale3d(1.8, 1.8, 1.8)';
       card.style.opacity = '0';
     }
 
+    // Trigger router navigation much faster to match the smooth 500ms exit
     setTimeout(() => {
       router.push('/menu');
-    }, 850);
+    }, 450);
   };
 
   if (!mounted) return null;
@@ -396,20 +410,31 @@ export default function Welcome3D() {
   return (
     <div
       className={clsx(
-        'relative min-h-screen w-full flex flex-col items-center justify-center overflow-hidden font-cairo select-none transition-all duration-1000 bg-[#070403]',
+        'relative min-h-screen w-full flex flex-col items-center justify-center overflow-hidden font-cairo select-none transition-all duration-500 bg-[#070403]',
         isExiting ? 'opacity-0 bg-[#070403] scale-98 pointer-events-none' : 'opacity-100'
       )}
     >
       {/* Background Canvas Particles */}
-      <canvas ref={canvasRef} className="absolute inset-0 w-full h-full z-0 block pointer-events-none" />
+      <canvas 
+        ref={canvasRef} 
+        className="absolute inset-0 w-full h-full z-0 block pointer-events-none transition-opacity duration-300"
+        style={{ opacity: isExiting ? 0 : 1 }}
+      />
 
       {/* Floating 3D Sparkles in space (Parallax background layers) */}
-      <div className="absolute top-1/4 left-1/10 w-2 h-2 bg-brand-beige-light rounded-full blur-[1px] animate-pulse opacity-60 z-10 pointer-events-none" style={{ transform: 'translateZ(-150px)' }} />
-      <div className="absolute bottom-1/4 right-1/10 w-3 h-3 bg-brand-gold rounded-full blur-[2px] animate-ping opacity-30 z-10 pointer-events-none" style={{ transform: 'translateZ(-100px)', animationDuration: '6s' }} />
-      <div className="absolute top-1/3 right-1/5 w-1.5 h-1.5 bg-white rounded-full blur-none animate-pulse opacity-85 z-10 pointer-events-none" style={{ transform: 'translateZ(-50px)' }} />
+      {!isExiting && (
+        <>
+          <div className="absolute top-1/4 left-1/10 w-2 h-2 bg-brand-beige-light rounded-full blur-[1px] animate-pulse opacity-60 z-10 pointer-events-none" style={{ transform: 'translateZ(-150px)' }} />
+          <div className="absolute bottom-1/4 right-1/10 w-3 h-3 bg-brand-gold rounded-full blur-[2px] animate-ping opacity-30 z-10 pointer-events-none" style={{ transform: 'translateZ(-100px)', animationDuration: '6s' }} />
+          <div className="absolute top-1/3 right-1/5 w-1.5 h-1.5 bg-white rounded-full blur-none animate-pulse opacity-85 z-10 pointer-events-none" style={{ transform: 'translateZ(-50px)' }} />
+        </>
+      )}
 
       {/* Top Navigation Bar */}
-      <div className="absolute top-6 left-6 right-6 flex items-center justify-between z-40 max-w-5xl mx-auto w-full px-6">
+      <div 
+        className="absolute top-6 left-6 right-6 flex items-center justify-between z-40 max-w-5xl mx-auto w-full px-6 transition-opacity duration-300"
+        style={{ opacity: isExiting ? 0 : 1, display: isExiting ? 'none' : 'flex' }}
+      >
         <div className="flex items-center gap-2.5 bg-black/60 backdrop-blur-xl border border-brand-beige/25 py-2 px-4 rounded-full shadow-[0_0_20px_rgba(200,169,126,0.1)] text-xs font-bold text-brand-beige-light">
           <Sparkles className="h-3.5 w-3.5 text-brand-gold animate-bounce" />
           <span>تألق الفخامة • Cafe Adnan Experience</span>
@@ -437,9 +462,10 @@ export default function Welcome3D() {
         <div 
           className={clsx(
             'absolute inset-5 rounded-full blur-[90px] opacity-40 transition-all duration-1000 z-0 pointer-events-none',
-            isHovering 
+            isHovering && !isExiting
               ? 'bg-brand-gold scale-120 blur-[110px] opacity-60' 
-              : 'bg-brand-beige opacity-35'
+              : 'bg-brand-beige opacity-35',
+            isExiting ? 'opacity-0 scale-90' : ''
           )}
         />
 
@@ -447,14 +473,13 @@ export default function Welcome3D() {
         <div
           ref={cardRef}
           onClick={handleEnterMenu}
-          style={{ transformStyle: 'preserve-3d', transition: isHovering ? 'none' : 'transform 0.8s cubic-bezier(0.15, 0.85, 0.15, 1)' }}
+          style={{ transformStyle: 'preserve-3d', transition: isHovering && !isExiting ? 'none' : 'transform 0.8s cubic-bezier(0.15, 0.85, 0.15, 1)' }}
           className={clsx(
             'relative w-full h-full rounded-[36px] z-10 overflow-hidden flex flex-col items-center justify-between p-8 md:p-9 text-center transition-all duration-500',
-            // Dedicated High-End Dark Luxury Theme for supreme contrast
             'bg-black/75 backdrop-blur-2xl',
             'border-2 border-brand-beige/35',
             'shadow-[0_25px_60px_rgba(0,0,0,0.85),_inset_0_2px_4px_rgba(255,255,255,0.15)]',
-            isHovering ? 'shadow-[0_30px_70px_rgba(200,169,126,0.22),_0_0_40px_rgba(200,169,126,0.1)]' : ''
+            isHovering && !isExiting ? 'shadow-[0_30px_70px_rgba(200,169,126,0.22),_0_0_40px_rgba(200,169,126,0.1)]' : ''
           )}
         >
           {/* Real Light Sheen Reflection Layer */}
@@ -482,28 +507,28 @@ export default function Welcome3D() {
             style={{ transform: 'translateZ(80px)', transformStyle: 'preserve-3d' }}
             className="relative w-44 h-44 md:w-52 md:h-52 flex items-center justify-center my-4 group z-20"
           >
-            {/* Holographic orbital ring 1 (Rotated 3D) */}
-            <div 
-              style={{ 
-                transform: 'rotateX(72deg) rotateY(15deg) translateZ(0px)',
-                border: '1.5px dashed rgba(200, 169, 126, 0.4)',
-                boxShadow: '0 0 15px rgba(200, 169, 126, 0.15), inset 0 0 15px rgba(200, 169, 126, 0.15)'
-              }}
-              className="absolute w-52 h-52 rounded-full animate-[spin_12s_linear_infinite] pointer-events-none" 
-            />
-
-            {/* Holographic orbital ring 2 (Rotated 3D Counter-clockwise) */}
-            <div 
-              style={{ 
-                transform: 'rotateX(64deg) rotateY(-20deg) translateZ(5px)',
-                border: '1px solid rgba(184, 134, 11, 0.35)',
-                boxShadow: '0 0 20px rgba(184, 134, 11, 0.2)'
-              }}
-              className="absolute w-44 h-44 rounded-full animate-[spin_18s_linear_infinite_reverse] pointer-events-none" 
-            />
-
-            {/* Outer halo disk glow */}
-            <div className="absolute inset-2 rounded-full bg-radial from-brand-gold/20 via-brand-beige/5 to-transparent blur-2xl animate-pulse pointer-events-none" />
+            {/* Holographic orbital rings - Hide them instantly on exit to free render costs */}
+            {!isExiting && (
+              <>
+                <div 
+                  style={{ 
+                    transform: 'rotateX(72deg) rotateY(15deg) translateZ(0px)',
+                    border: '1.5px dashed rgba(200, 169, 126, 0.4)',
+                    boxShadow: '0 0 15px rgba(200, 169, 126, 0.15), inset 0 0 15px rgba(200, 169, 126, 0.15)'
+                  }}
+                  className="absolute w-52 h-52 rounded-full animate-[spin_12s_linear_infinite] pointer-events-none" 
+                />
+                <div 
+                  style={{ 
+                    transform: 'rotateX(64deg) rotateY(-20deg) translateZ(5px)',
+                    border: '1px solid rgba(184, 134, 11, 0.35)',
+                    boxShadow: '0 0 20px rgba(184, 134, 11, 0.2)'
+                  }}
+                  className="absolute w-44 h-44 rounded-full animate-[spin_18s_linear_infinite_reverse] pointer-events-none" 
+                />
+                <div className="absolute inset-2 rounded-full bg-radial from-brand-gold/20 via-brand-beige/5 to-transparent blur-2xl animate-pulse pointer-events-none" />
+              </>
+            )}
 
             {/* Absolute Floating Logo Image (with dynamic shadow and shift) */}
             <img
@@ -517,7 +542,6 @@ export default function Welcome3D() {
               }}
               className={clsx(
                 'h-32 w-32 md:h-36 md:w-36 object-contain pointer-events-none',
-                // Keep original light-color logo visible on dark theme (non-inverted)
                 'invert-0'
               )}
             />
@@ -592,7 +616,10 @@ export default function Welcome3D() {
       </div>
 
       {/* Auto-redirect bottom progress indicator & skip prompt */}
-      <div className="absolute bottom-10 left-6 right-6 flex flex-col items-center gap-4.5 z-40 max-w-sm mx-auto w-full">
+      <div 
+        className="absolute bottom-10 left-6 right-6 flex flex-col items-center gap-4.5 z-40 max-w-sm mx-auto w-full transition-opacity duration-300"
+        style={{ opacity: isExiting ? 0 : 1, display: isExiting ? 'none' : 'flex' }}
+      >
         <div className="w-full h-1.5 bg-black/60 border border-brand-beige/10 rounded-full overflow-hidden shadow-[inset_0_1px_3px_rgba(0,0,0,0.5)]">
           <div
             style={{ width: `${countdown}%` }}
