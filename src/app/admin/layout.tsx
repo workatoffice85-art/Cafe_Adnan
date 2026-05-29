@@ -4,30 +4,39 @@ import { useState, useEffect } from 'react';
 import { Menu } from 'lucide-react';
 import { AdminSidebar } from '@/components/admin/AdminSidebar';
 import { usePathname } from 'next/navigation';
-import { createClient } from '@/lib/supabase/client';
+import { createClient, authLog } from '@/lib/supabase/client';
 import { LoadingSpinner } from '@/components/LoadingSpinner';
 
 const safeLocalStorageGet = (key: string): string | null => {
+  authLog(`[AuthDebug] safeLocalStorageGet - Reading: ${key}`);
   try {
     if (typeof window !== 'undefined' && window.localStorage) {
       const val = window.localStorage.getItem(key);
-      if (val) return val;
+      if (val) {
+        authLog(`[AuthDebug] safeLocalStorageGet - localStorage hit for key: ${key}`);
+        return val;
+      }
     }
   } catch (e) {
-    console.warn('localStorage read blocked:', e);
+    authLog(`[AuthDebug] localStorage read blocked: ${e}`);
   }
   
-  // Fallback: Read from document.cookie if localStorage is blocked by strict browser policy
+  // Fallback: Read from document.cookie with decoding
   try {
     if (typeof document !== 'undefined') {
       const value = `; ${document.cookie}`;
       const parts = value.split(`; ${key}=`);
       if (parts.length === 2) {
-        return parts.pop()?.split(';').shift() || null;
+        const val = parts.pop()?.split(';').shift();
+        if (val) {
+          const decoded = decodeURIComponent(val);
+          authLog(`[AuthDebug] safeLocalStorageGet - Cookie fallback hit for key: ${key}`);
+          return decoded;
+        }
       }
     }
   } catch (e) {
-    console.warn('Cookie read blocked:', e);
+    authLog(`[AuthDebug] Cookie read blocked: ${e}`);
   }
   return null;
 };
@@ -45,6 +54,9 @@ export default function AdminLayout({
 
   useEffect(() => {
     async function checkAuth() {
+      authLog('Layout Mounted');
+      authLog(`[AuthDebug] checkAuth starting. Current pathname: ${pathname}, isLoginPage: ${isLoginPage}`);
+
       // 0. Automatically redirect legacy devices immediately to the Lite Node.js Admin Portal if configured
       const isLegacyDevice = () => {
         if (typeof window === 'undefined') return false;
@@ -54,9 +66,14 @@ export default function AdminLayout({
         return isLegacyIOS || isLegacySafari;
       };
 
-      if (isLegacyDevice()) {
+      const legacy = isLegacyDevice();
+      authLog(`[AuthDebug] Is legacy device detected: ${legacy}`);
+
+      if (legacy) {
         const liteAdminUrl = process.env.NEXT_PUBLIC_LITE_ADMIN_URL;
+        authLog(`[AuthDebug] Legacy device check: NEXT_PUBLIC_LITE_ADMIN_URL = ${liteAdminUrl}`);
         if (liteAdminUrl) {
+          authLog(`[AuthDebug] Redirecting legacy device to Lite Portal: ${liteAdminUrl}`);
           window.location.href = liteAdminUrl;
           return;
         }
@@ -70,7 +87,10 @@ export default function AdminLayout({
           window.location.hash.includes('session=active')
         );
         const customSession = safeLocalStorageGet('cafe-adnan-custom-session');
+        authLog(`[AuthDebug] LoginPage check - hasWindowSession: ${hasWindowSession}, customSession: ${customSession}`);
+
         if (hasWindowSession || customSession === 'true') {
+          authLog('[AuthDebug] Active session found while on LoginPage. Redirecting to dashboard.');
           if (typeof window !== 'undefined' && window.name !== 'cafe-adnan-admin-session-active') {
             window.name = 'cafe-adnan-admin-session-active';
           }
@@ -88,7 +108,10 @@ export default function AdminLayout({
           window.location.search.includes('session=active') ||
           window.location.hash.includes('session=active')
         );
+        authLog(`[AuthDebug] Dashboard check - hasWindowSession: ${hasWindowSession}`);
+
         if (hasWindowSession) {
+          authLog('[AuthDebug] window.name or URL active session matched. Permitting entry.');
           if (typeof window !== 'undefined' && window.name !== 'cafe-adnan-admin-session-active') {
             window.name = 'cafe-adnan-admin-session-active';
           }
@@ -98,7 +121,10 @@ export default function AdminLayout({
 
         // 1. Check custom local fallback session FIRST (instant, synchronous, and crash-proof)
         const customSession = safeLocalStorageGet('cafe-adnan-custom-session');
+        authLog(`[AuthDebug] Dashboard check - customSession: ${customSession}`);
+
         if (customSession === 'true') {
+          authLog('[AuthDebug] Fallback custom session is active. Permitting entry.');
           if (typeof window !== 'undefined') {
             window.name = 'cafe-adnan-admin-session-active';
           }
@@ -108,30 +134,87 @@ export default function AdminLayout({
 
         // 2. Otherwise try checking standard Supabase auth
         const supabase = createClient();
-        const { data: { user } } = await supabase.auth.getUser();
-        
-        if (user) {
-          if (typeof window !== 'undefined') {
-            window.name = 'cafe-adnan-admin-session-active';
+
+        authLog('Checking Session');
+        authLog('[AuthDebug] Introducing 300ms delay to allow webview storage retrieval...');
+        await new Promise((resolve) => setTimeout(resolve, 300));
+
+        authLog('[AuthDebug] Querying standard getSession() first...');
+        const { data: { session } } = await supabase.auth.getSession();
+        authLog(`Session Found: ${!!session}`);
+
+        if (session) {
+          // Token Expiry Test & Manual Session Refresh Fallback (highly useful when autoRefreshToken is false)
+          const isNearExpiry = session.expires_at ? (session.expires_at * 1000 - Date.now() < 60000) : false;
+          if (isNearExpiry) {
+            authLog('[AuthDebug] Session token is expired or near expiry. Invoking manual session refresh...');
+            try {
+              const { data: { session: refreshedSession }, error: refreshError } = await supabase.auth.refreshSession();
+              if (refreshError) {
+                authLog(`[AuthDebug] Manual session refresh failed: ${refreshError.message}`);
+              } else if (refreshedSession) {
+                authLog('[AuthDebug] Manual session refresh succeeded!');
+              }
+            } catch (err) {
+              authLog(`[AuthDebug] Manual session refresh exception: ${err}`);
+            }
           }
-          setAuthLoading(false);
-          return;
+
+          authLog('[AuthDebug] Session verified, now querying getUser() for absolute token validation...');
+          const { data: { user } } = await supabase.auth.getUser();
+          authLog(`User Found: ${!!user}`);
+          
+          if (user) {
+            authLog('[AuthDebug] getUser() validated successfully. Permitting entry.');
+            if (typeof window !== 'undefined') {
+              window.name = 'cafe-adnan-admin-session-active';
+            }
+            setAuthLoading(false);
+            return;
+          } else {
+            authLog('[AuthDebug] getUser() failed to retrieve user data for active session.');
+          }
         }
 
-        // If neither session is valid, redirect to login
+        authLog('Redirecting To Login');
+        authLog('[AuthDebug] No valid session detected. Redirecting to login page...');
         window.location.href = '/admin/login';
-      } catch {
+      } catch (err) {
+        authLog(`[AuthDebug] Exception caught in layout auth check: ${err}`);
         // Safe fallback check: If getUser() throws a fatal exception on legacy WebKit, still allow local session
         const hasWindowSession = typeof window !== 'undefined' && window.name === 'cafe-adnan-admin-session-active';
         const customSession = safeLocalStorageGet('cafe-adnan-custom-session');
+        authLog(`[AuthDebug] Exception fallback check - hasWindowSession: ${hasWindowSession}, customSession: ${customSession}`);
+
         if (hasWindowSession || customSession === 'true') {
+          authLog('[AuthDebug] Permitting entry via safety fallbacks after exception.');
           setAuthLoading(false);
         } else {
+          authLog('Redirecting To Login');
+          authLog('[AuthDebug] Safety check failed. Redirecting to login page...');
           window.location.href = '/admin/login';
         }
       }
     }
     checkAuth();
+
+    // Multi-Tab Sync: Re-verify auth when tab visibility state changes (e.g., user returns from another tab where they logged out)
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        authLog('[AuthDebug] Tab became visible. Re-evaluating authentication...');
+        checkAuth();
+      }
+    };
+    
+    if (typeof document !== 'undefined') {
+      document.addEventListener('visibilitychange', handleVisibilityChange);
+    }
+    
+    return () => {
+      if (typeof document !== 'undefined') {
+        document.removeEventListener('visibilitychange', handleVisibilityChange);
+      }
+    };
   }, [isLoginPage]);
 
   if (authLoading && !isLoginPage) {

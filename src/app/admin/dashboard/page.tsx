@@ -6,6 +6,7 @@ import { StatsCard } from '@/components/admin/StatsCard';
 import { createClient } from '@/lib/supabase/client';
 import { PageLoading } from '@/components/LoadingSpinner';
 import Link from 'next/link';
+import { MenuItem } from '@/types/database';
 
 interface Stats {
   totalCategories: number;
@@ -30,7 +31,7 @@ export default function DashboardPage() {
       const totalCategories = catResult.count || 0;
       const items = itemResult.data || [];
       const totalItems = items.length;
-      const availableItems = items.filter((i) => i.available).length;
+      const availableItems = items.filter((i: MenuItem) => i.available).length;
       const unavailableItems = totalItems - availableItems;
 
       setStats({ totalCategories, totalItems, availableItems, unavailableItems });
