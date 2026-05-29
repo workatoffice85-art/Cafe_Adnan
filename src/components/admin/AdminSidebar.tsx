@@ -25,37 +25,8 @@ export function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
   const pathname = usePathname();
 
   const handleLogout = async () => {
-    // 1. Thoroughly wipe window.name and local storage keys
-    try {
-      if (typeof window !== 'undefined') {
-        window.name = '';
-        if (window.localStorage) {
-          window.localStorage.removeItem('cafe-adnan-custom-session');
-          window.localStorage.removeItem('cafe-adnan-custom-email');
-        }
-      }
-    } catch (e) {
-      console.warn('Logout storage clear failed:', e);
-    }
-
-    // 2. Wipe custom cookies
-    try {
-      if (typeof document !== 'undefined') {
-        document.cookie = 'cafe-adnan-custom-session=; path=/; max-age=0; SameSite=Lax';
-        document.cookie = 'cafe-adnan-custom-email=; path=/; max-age=0; SameSite=Lax';
-      }
-    } catch (e) {
-      console.warn('Logout cookie clear failed:', e);
-    }
-
-    // 3. Trigger standard Supabase logout
-    try {
-      const supabase = createClient();
-      await supabase.auth.signOut();
-    } catch (e) {
-      console.warn('Supabase logout failed:', e);
-    }
-
+    const supabase = createClient();
+    await supabase.auth.signOut();
     window.location.href = '/admin/login';
   };
 
