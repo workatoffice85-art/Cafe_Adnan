@@ -2,8 +2,11 @@
 
 import { useState, useEffect } from 'react';
 import { Logo } from '@/components/Logo';
-import { createClient, authLog } from '@/lib/supabase/client';
+import { createClient, authLog, detectLegacyBrowser } from '@/lib/supabase/client';
 import { LoadingSpinner } from '@/components/LoadingSpinner';
+
+// Early load diagnostic logging
+authLog('Login Page Loaded');
 
 const safeLocalStorageSet = (key: string, value: string) => {
   authLog(`[AuthDebug] safeLocalStorageSet - Writing: ${key}`);
@@ -60,11 +63,19 @@ export default function AdminLoginPage() {
 
   // Poll window.__AUTH_DEBUG__ every 1 second to update diagnostic logs overlay
   useEffect(() => {
+    authLog('Login Page Mounted');
     if (typeof window !== 'undefined') {
       if (!(window as any).__AUTH_DEBUG__) {
         (window as any).__AUTH_DEBUG__ = [];
       }
       setDebugLogs([...(window as any).__AUTH_DEBUG__]);
+
+      const isLegacy = detectLegacyBrowser();
+      authLog(`[AuthDebug] Login component mounted. Legacy browser: ${isLegacy}`);
+      if (isLegacy) {
+        // Automatically show logs expanded by default on legacy devices so they do not need to click
+        setShowDebug(true);
+      }
 
       const interval = setInterval(() => {
         setDebugLogs([...((window as any).__AUTH_DEBUG__ || [])]);
@@ -74,15 +85,22 @@ export default function AdminLoginPage() {
     }
   }, []);
 
+  const handleToggleDebug = (e: React.MouseEvent | React.TouchEvent) => {
+    e.preventDefault();
+    setShowDebug((prev) => !prev);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setLoading(true);
+    authLog('Login Submit Started');
     authLog(`[AuthDebug] Form submitted. Attempting login for: ${email}`);
 
     try {
       // 1. Hardcoded Bypass FIRST (Instant, setup-free, 100% crash-proof and network-free)
       if (email.trim().toLowerCase() === 'admin@cafeadnan.com' && password.trim() === '1234') {
+        authLog('Login Success');
         authLog('[AuthDebug] Hardcoded bypass triggered.');
         safeLocalStorageSet('cafe-adnan-custom-session', 'true');
         safeLocalStorageSet('cafe-adnan-custom-email', email.trim().toLowerCase());
@@ -115,6 +133,7 @@ export default function AdminLoginPage() {
       }
 
       if (!authError) {
+        authLog('Login Success');
         authLog(`[AuthDebug] Supabase login succeeded! Session established: ${sessionData?.session ? 'yes' : 'no'}`);
         safeLocalStorageRemove('cafe-adnan-custom-session');
         if (typeof window !== 'undefined') {
@@ -146,6 +165,7 @@ export default function AdminLoginPage() {
       }
 
       if (isCustomValid) {
+        authLog('Login Success');
         authLog('[AuthDebug] Database RPC check validated credentials!');
         safeLocalStorageSet('cafe-adnan-custom-session', 'true');
         safeLocalStorageSet('cafe-adnan-custom-email', email.trim().toLowerCase());
@@ -238,11 +258,16 @@ export default function AdminLoginPage() {
         </form>
 
         {/* Debug Logs Collapsible Panel */}
-        <div className="mt-8 border border-brand-gray-200 dark:border-brand-gray-800 rounded-xl p-4 bg-brand-gray-50 dark:bg-brand-gray-900/50">
+        <div 
+          className="mt-8 border-2 border-dashed border-brand-beige/50 dark:border-brand-beige/30 rounded-xl p-4 bg-brand-gray-50 dark:bg-brand-gray-900/50"
+          style={{ position: 'relative', zIndex: 9999, pointerEvents: 'auto' }}
+        >
           <button
             type="button"
-            onClick={() => setShowDebug(!showDebug)}
-            className="w-full flex items-center justify-between text-xs font-semibold text-brand-gray-500 dark:text-brand-gray-400 hover:text-brand-beige"
+            onClick={handleToggleDebug}
+            onTouchStart={handleToggleDebug}
+            className="w-full flex items-center justify-between text-xs font-semibold text-brand-gray-500 dark:text-brand-gray-400 hover:text-brand-beige cursor-pointer py-1"
+            style={{ pointerEvents: 'auto', position: 'relative', zIndex: 10000 }}
           >
             <span>🛠️ لوحة تشخيص تسجيل الدخول (Debug Overlay)</span>
             <span>{showDebug ? 'إخفاء ▲' : 'عرض ▼'}</span>
