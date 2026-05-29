@@ -115,36 +115,8 @@ export default function AdminLoginPage() {
       authLog('[AuthDebug] Initializing Supabase client...');
       const supabase = createClient();
 
-      // 2. Try standard Supabase Auth
-      // Wrap it in a sub-try-catch to prevent fatal WebKit crashes on old iOS Safari
-      let authError = null;
-      let sessionData = null;
-      authLog('[AuthDebug] Invoking standard supabase.auth.signInWithPassword...');
-      try {
-        const { data, error } = await supabase.auth.signInWithPassword({
-          email,
-          password,
-        });
-        authError = error;
-        sessionData = data;
-      } catch (err) {
-        authLog(`[AuthDebug] Standard Supabase auth crashed, trying RPC: ${err}`);
-        authError = err || new Error('Auth crashed');
-      }
-
-      if (!authError) {
-        authLog('Login Success');
-        authLog(`[AuthDebug] Supabase login succeeded! Session established: ${sessionData?.session ? 'yes' : 'no'}`);
-        safeLocalStorageRemove('cafe-adnan-custom-session');
-        if (typeof window !== 'undefined') {
-          window.name = 'cafe-adnan-admin-session-active';
-        }
-        authLog('[AuthDebug] Redirecting to /admin/dashboard (standard success)');
-        window.location.href = '/admin/dashboard?session=active';
-        return;
-      }
-
-      authLog(`[AuthDebug] Standard auth failed. Error details: ${(authError as any).message || String(authError)}`);
+      // 2. Standard Supabase Auth bypassed for maximum legacy device compatibility
+      authLog('[AuthDebug] Standard Supabase signInWithPassword bypassed.');
 
       // 3. Try custom database RPC check
       // Wrap it in a sub-try-catch to prevent crashes if the RPC is not defined in the database

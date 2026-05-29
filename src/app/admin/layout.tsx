@@ -132,52 +132,11 @@ export default function AdminLayout({
           return;
         }
 
-        // 2. Otherwise try checking standard Supabase auth
-        const supabase = createClient();
-
-        authLog('Checking Session');
-        authLog('[AuthDebug] Introducing 300ms delay to allow webview storage retrieval...');
-        await new Promise((resolve) => setTimeout(resolve, 300));
-
-        authLog('[AuthDebug] Querying standard getSession() first...');
-        const { data: { session } } = await supabase.auth.getSession();
-        authLog(`Session Found: ${!!session}`);
-
-        if (session) {
-          // Token Expiry Test & Manual Session Refresh Fallback (highly useful when autoRefreshToken is false)
-          const isNearExpiry = session.expires_at ? (session.expires_at * 1000 - Date.now() < 60000) : false;
-          if (isNearExpiry) {
-            authLog('[AuthDebug] Session token is expired or near expiry. Invoking manual session refresh...');
-            try {
-              const { data: { session: refreshedSession }, error: refreshError } = await supabase.auth.refreshSession();
-              if (refreshError) {
-                authLog(`[AuthDebug] Manual session refresh failed: ${refreshError.message}`);
-              } else if (refreshedSession) {
-                authLog('[AuthDebug] Manual session refresh succeeded!');
-              }
-            } catch (err) {
-              authLog(`[AuthDebug] Manual session refresh exception: ${err}`);
-            }
-          }
-
-          authLog('[AuthDebug] Session verified, now querying getUser() for absolute token validation...');
-          const { data: { user } } = await supabase.auth.getUser();
-          authLog(`User Found: ${!!user}`);
-          
-          if (user) {
-            authLog('[AuthDebug] getUser() validated successfully. Permitting entry.');
-            if (typeof window !== 'undefined') {
-              window.name = 'cafe-adnan-admin-session-active';
-            }
-            setAuthLoading(false);
-            return;
-          } else {
-            authLog('[AuthDebug] getUser() failed to retrieve user data for active session.');
-          }
-        }
+        // 2. Standard Supabase auth checks bypassed for maximum legacy device compatibility
+        authLog('[AuthDebug] Standard Supabase layout session checks bypassed.');
 
         authLog('Redirecting To Login');
-        authLog('[AuthDebug] No valid session detected. Redirecting to login page...');
+        authLog('[AuthDebug] No valid custom session detected. Redirecting to login page...');
         window.location.href = '/admin/login';
       } catch (err) {
         authLog(`[AuthDebug] Exception caught in layout auth check: ${err}`);
