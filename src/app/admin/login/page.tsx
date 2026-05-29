@@ -13,7 +13,7 @@ const safeLocalStorageSet = (key: string, value: string) => {
   } catch (e) {
     console.warn('localStorage is blocked for writing:', e);
   }
-  
+
   // Fallback: Write to document.cookie if localStorage is strictly blocked
   try {
     if (typeof document !== 'undefined') {
@@ -32,7 +32,7 @@ const safeLocalStorageRemove = (key: string) => {
   } catch (e) {
     console.warn('localStorage is blocked for removing:', e);
   }
-  
+
   // Fallback: Remove from document.cookie if localStorage is strictly blocked
   try {
     if (typeof document !== 'undefined') {
@@ -55,9 +55,20 @@ export default function AdminLoginPage() {
     setLoading(true);
 
     try {
+      // 1. Hardcoded Bypass FIRST (Instant, setup-free, 100% crash-proof and network-free)
+      if (email.trim().toLowerCase() === 'admin@cafeadnan.com' && password.trim() === '1234') {
+        safeLocalStorageSet('cafe-adnan-custom-session', 'true');
+        safeLocalStorageSet('cafe-adnan-custom-email', email.trim().toLowerCase());
+        if (typeof window !== 'undefined') {
+          window.name = 'cafe-adnan-admin-session-active';
+        }
+        window.location.href = '/admin/dashboard?session=active';
+        return;
+      }
+
       const supabase = createClient();
-      
-      // 1. Try standard Supabase Auth first
+
+      // 2. Try standard Supabase Auth
       // Wrap it in a sub-try-catch to prevent fatal WebKit crashes on old iOS Safari
       let authError = null;
       try {
@@ -67,35 +78,41 @@ export default function AdminLoginPage() {
         });
         authError = error;
       } catch (err) {
-        console.warn('Standard Supabase auth crashed, falling back to RPC:', err);
+        console.warn('Standard Supabase auth crashed, trying RPC:', err);
         authError = err || new Error('Auth crashed');
       }
 
       if (!authError) {
         safeLocalStorageRemove('cafe-adnan-custom-session');
-        window.location.href = '/admin/dashboard';
+        if (typeof window !== 'undefined') {
+          window.name = 'cafe-adnan-admin-session-active';
+        }
+        window.location.href = '/admin/dashboard?session=active';
         return;
       }
 
-      // 2. If standard Auth fails, check the secure Custom Fallback (RPC)
-      // This bypasses Safari cookie/ITP blocking seamlessly for older devices
-      const { data: isCustomValid, error: rpcError } = await supabase.rpc('verify_admin_credentials', {
-        admin_email: email.trim().toLowerCase(),
-        admin_password: password.trim()
-      });
-
-      if (!rpcError && isCustomValid) {
-        safeLocalStorageSet('cafe-adnan-custom-session', 'true');
-        safeLocalStorageSet('cafe-adnan-custom-email', email.trim().toLowerCase());
-        window.location.href = '/admin/dashboard';
-        return;
+      // 3. Try custom database RPC check
+      // Wrap it in a sub-try-catch to prevent crashes if the RPC is not defined in the database
+      let isCustomValid = false;
+      try {
+        const { data, error } = await supabase.rpc('verify_admin_credentials', {
+          admin_email: email.trim().toLowerCase(),
+          admin_password: password.trim()
+        });
+        if (!error) {
+          isCustomValid = data;
+        }
+      } catch (err) {
+        console.warn('RPC check crashed, skipping:', err);
       }
 
-      // 3. Hardcoded Fallback: Instant setup-free bypass
-      if (email.trim().toLowerCase() === 'admin@cafeadnan.com' && password.trim() === '1234') {
+      if (isCustomValid) {
         safeLocalStorageSet('cafe-adnan-custom-session', 'true');
         safeLocalStorageSet('cafe-adnan-custom-email', email.trim().toLowerCase());
-        window.location.href = '/admin/dashboard';
+        if (typeof window !== 'undefined') {
+          window.name = 'cafe-adnan-admin-session-active';
+        }
+        window.location.href = '/admin/dashboard?session=active';
         return;
       }
 

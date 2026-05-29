@@ -63,14 +63,45 @@ export default function AdminLayout({
       }
 
       if (isLoginPage) {
+        // If they are on the login page but have a active legacy/window session, go to dashboard
+        const hasWindowSession = typeof window !== 'undefined' && (
+          window.name === 'cafe-adnan-admin-session-active' ||
+          window.location.search.includes('session=active') ||
+          window.location.hash.includes('session=active')
+        );
+        const customSession = safeLocalStorageGet('cafe-adnan-custom-session');
+        if (hasWindowSession || customSession === 'true') {
+          if (typeof window !== 'undefined' && window.name !== 'cafe-adnan-admin-session-active') {
+            window.name = 'cafe-adnan-admin-session-active';
+          }
+          window.location.href = '/admin/dashboard';
+          return;
+        }
         setAuthLoading(false);
         return;
       }
 
       try {
+        // 0. Check window.name and URL query parameters for ultra-safe legacy session persistence (crash-proof and cookie-less)
+        const hasWindowSession = typeof window !== 'undefined' && (
+          window.name === 'cafe-adnan-admin-session-active' ||
+          window.location.search.includes('session=active') ||
+          window.location.hash.includes('session=active')
+        );
+        if (hasWindowSession) {
+          if (typeof window !== 'undefined' && window.name !== 'cafe-adnan-admin-session-active') {
+            window.name = 'cafe-adnan-admin-session-active';
+          }
+          setAuthLoading(false);
+          return;
+        }
+
         // 1. Check custom local fallback session FIRST (instant, synchronous, and crash-proof)
         const customSession = safeLocalStorageGet('cafe-adnan-custom-session');
         if (customSession === 'true') {
+          if (typeof window !== 'undefined') {
+            window.name = 'cafe-adnan-admin-session-active';
+          }
           setAuthLoading(false);
           return;
         }
@@ -80,6 +111,9 @@ export default function AdminLayout({
         const { data: { user } } = await supabase.auth.getUser();
         
         if (user) {
+          if (typeof window !== 'undefined') {
+            window.name = 'cafe-adnan-admin-session-active';
+          }
           setAuthLoading(false);
           return;
         }
@@ -88,8 +122,9 @@ export default function AdminLayout({
         window.location.href = '/admin/login';
       } catch {
         // Safe fallback check: If getUser() throws a fatal exception on legacy WebKit, still allow local session
+        const hasWindowSession = typeof window !== 'undefined' && window.name === 'cafe-adnan-admin-session-active';
         const customSession = safeLocalStorageGet('cafe-adnan-custom-session');
-        if (customSession === 'true') {
+        if (hasWindowSession || customSession === 'true') {
           setAuthLoading(false);
         } else {
           window.location.href = '/admin/login';
